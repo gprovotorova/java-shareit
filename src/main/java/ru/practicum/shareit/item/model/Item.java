@@ -1,10 +1,11 @@
 package ru.practicum.shareit.item.model;
 
+
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import ru.practicum.shareit.common.Create;
+import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
 import javax.validation.constraints.NotBlank;
@@ -14,8 +15,7 @@ import javax.validation.constraints.NotNull;
  * TODO Sprint add-controllers.
  */
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Item {
@@ -35,4 +35,6 @@ public class Item {
     private Boolean available;
 
     private User owner;
+
+    private ItemRequest request;
 }
