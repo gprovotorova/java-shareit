@@ -1,7 +1,6 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
-<<<<<<< HEAD
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.model.Booking;
@@ -22,27 +21,12 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
-=======
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exception.ObjectNotFoundException;
-import ru.practicum.shareit.exception.ValidationException;
-import ru.practicum.shareit.item.mapper.ItemMapper;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.item.repository.ItemRepository;
-import ru.practicum.shareit.user.mapper.UserMapper;
-import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.service.UserService;
-
->>>>>>> 61d3a36fb68671b2bc56a32d663def57fc07f660
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-<<<<<<< HEAD
 @Transactional
 public class ItemServiceImpl implements ItemService {
 
@@ -50,19 +34,10 @@ public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
     private final BookingRepository bookingRepository;
     private final CommentRepository commentRepository;
-=======
-public class ItemServiceImpl implements ItemService {
-
-    @Autowired
-    private ItemRepository itemRepository;
-    @Autowired
-    private UserService userService;
->>>>>>> 61d3a36fb68671b2bc56a32d663def57fc07f660
 
     @Override
     public ItemDto createItem(ItemDto itemDto, long userId) {
         if (itemDto.getName() == null || itemDto.getName().isBlank()) {
-<<<<<<< HEAD
             throw new ObjectValidationException("Name is empty.");
         }
         if (itemDto.getDescription() == null || itemDto.getDescription().isBlank()) {
@@ -76,35 +51,15 @@ public class ItemServiceImpl implements ItemService {
         Item item = ItemMapper.toItem(itemDto, user);
         item.setOwner(user);
         return ItemMapper.toItemDto(itemRepository.save(item));
-=======
-            throw new ValidationException("Name is empty");
-        }
-        if (itemDto.getDescription() == null || itemDto.getDescription().isBlank()) {
-            throw new ValidationException("Description is empty");
-        }
-        if (itemDto.getAvailable() == null) {
-            throw new ValidationException("Available is empty");
-        }
-        UserDto userDto = userService.getUser(userId);
-        Item item = ItemMapper.toItem(itemDto);
-        item.setOwner(UserMapper.toUser(userDto));
-        itemRepository.save(item);
-        return ItemMapper.toItemDto(item);
->>>>>>> 61d3a36fb68671b2bc56a32d663def57fc07f660
     }
 
     @Override
     public ItemDto updateItem(ItemDto itemDto, long userId, long itemId) {
-<<<<<<< HEAD
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ObjectNotFoundException("User with id=" + userId + " not found."));
         Item item = ItemMapper.toItem(itemDto, user);
         Item updatedItem = itemRepository.findById(itemId)
                 .orElseThrow(() -> new ObjectNotFoundException("Item with id=" + itemId + " not found."));
-=======
-        Item item = ItemMapper.toItem(itemDto);
-        Item updatedItem = ItemMapper.toItem(getItem(itemId));
->>>>>>> 61d3a36fb68671b2bc56a32d663def57fc07f660
         if (item.getDescription() != null && !item.getDescription().isBlank()) {
             updatedItem.setDescription(item.getDescription());
         }
@@ -114,7 +69,6 @@ public class ItemServiceImpl implements ItemService {
         if (item.getAvailable() != null) {
             updatedItem.setAvailable(item.getAvailable());
         }
-<<<<<<< HEAD
         if (user != null && !updatedItem.getOwner().getId().equals(userId)) {
             throw new ObjectNotFoundException("User with id=" + userId + " not found.");
         }
@@ -187,42 +141,5 @@ public class ItemServiceImpl implements ItemService {
 
     private List<Comment> getReviewsByItemId(Item item) {
         return commentRepository.getByItem_IdOrderByCreatedDesc(item.getId());
-=======
-
-        if (userService.getUser(userId) != null && !updatedItem.getOwner().getUserId().equals(userId)) {
-            throw new ObjectNotFoundException("User with id=" + userId + " not found");
-        }
-
-        itemRepository.update(updatedItem);
-        return ItemMapper.toItemDto(updatedItem);
-    }
-
-    @Override
-    public ItemDto getItem(long itemId) {
-        return ItemMapper.toItemDto(itemRepository.findById(itemId)
-                .orElseThrow(() -> new ObjectNotFoundException("Item with id=" + itemId + " not found")));
-    }
-
-    @Override
-    public List<ItemDto> getItemsByUser(Long userId) {
-        if (userId == null) {
-            return itemRepository.getAll().stream()
-                    .map(ItemMapper::toItemDto)
-                    .collect(Collectors.toList());
-        } else {
-            return itemRepository.getAllItemsByUser(userId)
-                    .stream()
-                    .map(ItemMapper::toItemDto)
-                    .collect(Collectors.toList());
-        }
-    }
-
-    @Override
-    public List<Item> searchItem(String text) {
-        if (text.isEmpty()) {
-            return new ArrayList<>();
-        }
-        return itemRepository.search(text);
->>>>>>> 61d3a36fb68671b2bc56a32d663def57fc07f660
     }
 }

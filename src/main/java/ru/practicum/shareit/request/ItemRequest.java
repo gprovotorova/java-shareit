@@ -4,7 +4,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.shareit.user.model.User;
 
-<<<<<<< HEAD
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.persistence.Id;
@@ -35,19 +34,5 @@ public class ItemRequest {
     private User requestor;
 
     @Column(name = "created_date")
-=======
-import java.time.LocalDateTime;
-
-/**
- * TODO Sprint add-item-requests.
- */
-
-@Data
-@NoArgsConstructor
-public class ItemRequest {
-    private Long requestId;
-    private String description;
-    private User requestor;
->>>>>>> 61d3a36fb68671b2bc56a32d663def57fc07f660
     private LocalDateTime created;
 }
