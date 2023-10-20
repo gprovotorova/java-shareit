@@ -1,7 +1,13 @@
 package ru.practicum.shareit.user.controller;
 
+<<<<<<< HEAD
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+=======
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+>>>>>>> 61d3a36fb68671b2bc56a32d663def57fc07f660
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +22,7 @@ import ru.practicum.shareit.common.Create;
 import ru.practicum.shareit.common.Update;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserServiceImpl;
+<<<<<<< HEAD
 
 import java.util.List;
 
@@ -26,6 +33,25 @@ import java.util.List;
 @Validated
 public class UserController {
 
+=======
+import ru.practicum.shareit.user.service.ValidateService;
+
+import java.util.List;
+
+/**
+ * TODO Sprint add-controllers.
+ */
+@RestController
+@RequestMapping("/users")
+@Slf4j
+@RequiredArgsConstructor
+@Validated
+public class UserController {
+
+    @Autowired
+    private ValidateService validateService;
+    @Autowired
+>>>>>>> 61d3a36fb68671b2bc56a32d663def57fc07f660
     private final UserServiceImpl userService;
 
     @GetMapping("/{userId}")
@@ -43,13 +69,23 @@ public class UserController {
     @PostMapping
     public UserDto createUser(@Validated({Create.class}) @RequestBody UserDto userDto) {
         log.info("Creating user {}", userDto);
+<<<<<<< HEAD
+=======
+        validateService.userEmailValidation(userDto);
+>>>>>>> 61d3a36fb68671b2bc56a32d663def57fc07f660
         return userService.createUser(userDto);
     }
 
     @PatchMapping("/{userId}")
     public UserDto update(@Validated({Update.class}) @PathVariable long userId, @RequestBody UserDto userDto) {
+<<<<<<< HEAD
         log.info("Updating user {}", userDto);
         return userService.updateUser(userDto, userId);
+=======
+        userDto.setId(userId);
+        log.info("Updating user {}", userDto);
+        return userService.updateUser(userDto);
+>>>>>>> 61d3a36fb68671b2bc56a32d663def57fc07f660
     }
 
     @DeleteMapping("/{userId}")
