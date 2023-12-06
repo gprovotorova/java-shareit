@@ -6,9 +6,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import lombok.extern.slf4j.Slf4j;
-import ru.practicum.shareit.exception.ObjectExistException;
-import ru.practicum.shareit.exception.ObjectNotFoundException;
-import ru.practicum.shareit.exception.ObjectValidationException;
+import ru.practicum.shareit.exception.*;
+
+import java.util.Map;
 
 @RestControllerAdvice
 @Slf4j
@@ -40,6 +40,19 @@ public class ErrorHandler {
     public ErrorResponse handleExistError(final RuntimeException e) {
         log.debug("500 {}", e.getMessage());
         return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ErrorResponse handleStatusException(final UnsupportedStatusException e) {
+        log.debug("500 {}", e.getMessage());
+        return new ErrorResponse(e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handle(final StatusBookingException e) {
+        return Map.of("error", e.getMessage());
     }
 }
 

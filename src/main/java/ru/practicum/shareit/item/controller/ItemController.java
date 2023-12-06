@@ -44,7 +44,7 @@ public class ItemController {
     }
 
     @GetMapping(value = "/{itemId}")
-    public ItemDtoWithBooking get(@RequestHeader("X-Sharer-User-Id") long userId, @PathVariable long itemId) {
+    public ItemDtoWithBooking getById(@RequestHeader("X-Sharer-User-Id") long userId, @PathVariable long itemId) {
         log.info("Get item id={}", itemId);
         return itemService.getItemById(userId, itemId);
     }
@@ -56,15 +56,15 @@ public class ItemController {
     }
 
     @GetMapping("/search")
-    public List<ItemDto> searchItemByQuery(@RequestParam("text") String text) {
+    public List<ItemDto> searchItemByQuery(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestParam String text) {
         log.info("Search item text={}", text);
-        return itemService.searchItemByQuery(text);
+        return itemService.searchItemByQuery(userId, text);
     }
 
     @PostMapping("/{itemId}/comment")
     public CommentDto addComment(@RequestHeader("X-Sharer-User-Id") long userId,
                                  @PathVariable long itemId,
-                                 @RequestBody CommentDto commentDto){
+                                 @RequestBody CommentDto commentDto) {
         log.info("Add comment for item {} by user {}", itemId, userId);
         return itemService.addComment(userId, itemId, commentDto);
     }

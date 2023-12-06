@@ -14,7 +14,7 @@ public class ItemMapperWithBooking {
     public static ItemDtoWithBooking toItemDtoWithBooking(List<Comment> comments,
                                                           Booking lastBooking,
                                                           Booking nextBooking,
-                                                          Item item){
+                                                          Item item) {
         List<ItemDtoWithBooking.Comment> itemComments = comments.stream()
                 .map(commentTemp -> {
                     ItemDtoWithBooking.Comment comment = new ItemDtoWithBooking.Comment();
@@ -26,7 +26,7 @@ public class ItemMapperWithBooking {
                 }).collect(Collectors.toList());
 
         ItemDtoWithBooking.Booking lastBookingTemp = new ItemDtoWithBooking.Booking();
-        if(lastBooking != null){
+        if (lastBooking != null) {
             lastBookingTemp.setId(lastBooking.getId());
             lastBookingTemp.setBookerId(lastBooking.getBooker().getId());
         } else {
@@ -34,7 +34,7 @@ public class ItemMapperWithBooking {
         }
 
         ItemDtoWithBooking.Booking nextBookingTemp = new ItemDtoWithBooking.Booking();
-        if(nextBooking != null){
+        if (nextBooking != null) {
             nextBookingTemp.setId(nextBooking.getId());
             nextBookingTemp.setBookerId(nextBooking.getBooker().getId());
         } else {

@@ -25,7 +25,7 @@ public class ItemDtoWithBooking {
     @AllArgsConstructor
     @NoArgsConstructor
     @Builder
-    public static class Booking{
+    public static class Booking {
         private Long id;
         private Long bookerId;
     }

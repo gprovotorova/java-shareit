@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.Collection;
+import java.util.List;
 
 @Repository
 public interface ItemRepository extends JpaRepository<Item, Long> {
@@ -14,8 +15,10 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     Collection<Item> findByOwnerIdOrderByIdAsc(Long userId);
 
     @Query("select i from Item i " +
-            "where lower(i.name) like lower (concat('%', :query, '%')) " +
-            "or lower(i.description) like lower (concat('%', :query, '%')) " +
-            "and i.available = true")
-    Collection<Item> searchByQuery(@Param("query") String query);
+            "where i.available = true " +
+            "and (lower(i.name) like concat('%', lower(:query),'%') " +
+            "or lower(i.description) like concat('%', lower(:query),'%'))")
+    List<Item> searchByQuery(String query);
+
+    //List<Item> searchByQuery(@Param("query") String query);
 }

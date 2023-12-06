@@ -1,8 +1,11 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.practicum.shareit.booking.enums.BookingStatus;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.ObjectNotFoundException;
@@ -20,10 +23,15 @@ import ru.practicum.shareit.comments.repository.CommentRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
+import static ru.practicum.shareit.item.mapper.ItemMapper.toItemDto;
 
 @Service
 @RequiredArgsConstructor
@@ -47,10 +55,10 @@ public class ItemServiceImpl implements ItemService {
             throw new ObjectValidationException("Available is empty.");
         }
         User user = userRepository.findById(userId)
-                .orElseThrow(()-> new ObjectNotFoundException("User with id= " + userId + " not found."));
+                .orElseThrow(() -> new ObjectNotFoundException("User with id= " + userId + " not found."));
         Item item = ItemMapper.toItem(itemDto, user);
         item.setOwner(user);
-        return ItemMapper.toItemDto(itemRepository.save(item));
+        return toItemDto(itemRepository.save(item));
     }
 
     @Override
@@ -72,7 +80,7 @@ public class ItemServiceImpl implements ItemService {
         if (user != null && !updatedItem.getOwner().getId().equals(userId)) {
             throw new ObjectNotFoundException("User with id=" + userId + " not found.");
         }
-        return ItemMapper.toItemDto(itemRepository.save(updatedItem));
+        return toItemDto(itemRepository.save(updatedItem));
     }
 
     @Override
@@ -81,47 +89,51 @@ public class ItemServiceImpl implements ItemService {
                 .orElseThrow(() -> new ObjectNotFoundException("Item with id=" + itemId + " not found."));
         List<Comment> comments = getReviewsByItemId(item);
         if(item.getOwner().getId().equals(userId)){
-            LocalDateTime dateTime = LocalDateTime.now();
             Booking lastBooking =
-                    bookingRepository.getFirstByItemIdAndEndBeforeOrderByEndDesc(itemId, dateTime);
+                    bookingRepository.getFirstByItemIdAndStatusNotAndStartBeforeOrderByEndDesc(itemId,
+                            BookingStatus.REJECTED, LocalDateTime.now());
             Booking nextBooking =
-                    bookingRepository.getTopByItemIdAndStartAfterOrderByStartAsc(itemId, dateTime);
+                    bookingRepository.getFirstByItemIdAndStatusNotAndStartAfterOrderByStart(itemId,
+                            BookingStatus.REJECTED, LocalDateTime.now());
             return ItemMapperWithBooking.toItemDtoWithBooking(comments, lastBooking, nextBooking, item);
         } else
-        return ItemMapperWithBooking.toItemDtoWithBooking(comments, null, null, item);
+            return ItemMapperWithBooking.toItemDtoWithBooking(comments, null, null, item);
     }
 
     @Override
     public List<ItemDtoWithBooking> getItemsByUser(Long userId) {
+        LocalDateTime dateTime = LocalDateTime.now();
         return itemRepository.findByOwnerIdOrderByIdAsc(userId)
                 .stream()
                 .map(item -> {
                     List<Comment> comments = getReviewsByItemId(item);
                     Booking lastBooking =
-                            bookingRepository.getFirstByItemIdAndEndBeforeOrderByEndDesc(item.getId(),
-                                    LocalDateTime.now());
+                            bookingRepository.getFirstByItemIdAndEndBeforeOrderByEndDesc(item.getId(), dateTime);
                     Booking nextBooking =
-                            bookingRepository.getTopByItemIdAndStartAfterOrderByStartAsc(item.getId(),
-                                    LocalDateTime.now());
+                            bookingRepository.getTopByItemIdAndStartAfterOrderByStartAsc(item.getId(), dateTime);
                     return ItemMapperWithBooking.toItemDtoWithBooking(comments, lastBooking, nextBooking, item);
                 })
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
     @Override
-    public List<ItemDto> searchItemByQuery(String text) {
-        if (text.isEmpty()) {
+    public List<ItemDto> searchItemByQuery(Long userId, String text) {
+        if (text.isEmpty() || text.isBlank()) {
             return new ArrayList<>();
         }
-        return itemRepository.searchByQuery(text)
+
+        List <Item> items2 = itemRepository.findAll();
+
+        List <ItemDto> items = itemRepository.searchByQuery(text)
                 .stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());
+        return items;
     }
 
     @Override
-    public CommentDto addComment(Long userId, Long itemId, CommentDto commentDto){
-        if(commentDto.getText().isEmpty() || commentDto.getText().isBlank()){
+    public CommentDto addComment(Long userId, Long itemId, CommentDto commentDto) {
+        if (commentDto.getText().isEmpty() || commentDto.getText().isBlank()) {
             throw new ObjectValidationException("This comment is empty.");
         }
         User user = userRepository.findById(userId)
@@ -132,7 +144,7 @@ public class ItemServiceImpl implements ItemService {
         Comment comment = CommentMapper.toComment(commentDto, item, user);
         List<Booking> booking =
                 bookingRepository.getByBookerIdStatePast(comment.getUser().getId(), LocalDateTime.now());
-        if(booking.isEmpty()){
+        if (booking.isEmpty()) {
             throw new ObjectValidationException("The user has not booked any item.");
         }
         comment.setCreated(LocalDateTime.now());

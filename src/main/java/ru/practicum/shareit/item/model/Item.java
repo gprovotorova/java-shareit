@@ -40,18 +40,18 @@ public class Item {
     @Column(name = "id")
     private Long id;
 
-    @NotNull(groups = {Create.class})
-    @NotBlank(groups = {Create.class})
-    @Column(name = "name")
+    //@NotNull(groups = {Create.class})
+    //@NotBlank(groups = {Create.class})
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @NotNull(groups = {Create.class})
-    @NotBlank(groups = {Create.class})
-    @Column(name = "description")
+    //@NotNull(groups = {Create.class})
+    //@NotBlank(groups = {Create.class})
+    @Column(name = "description", nullable = false)
     private String description;
 
-    @NotNull(groups = {Create.class})
-    @NotBlank(groups = {Create.class})
+    //@NotNull(groups = {Create.class})
+    //@NotBlank(groups = {Create.class})
     @Column(name = "available")
     private Boolean available;
 

@@ -8,7 +8,7 @@ import ru.practicum.shareit.user.model.User;
 
 @Component
 public class CommentMapper {
-    public static CommentDto toCommentDto(Comment comment){
+    public static CommentDto toCommentDto(Comment comment) {
         return new CommentDto(
                 comment.getId(),
                 comment.getText(),
@@ -17,7 +17,7 @@ public class CommentMapper {
         );
     }
 
-    public static Comment toComment(CommentDto commentDto, Item item, User user){
+    public static Comment toComment(CommentDto commentDto, Item item, User user) {
         return Comment.builder()
                 .id(commentDto.getId())
                 .text(commentDto.getText())

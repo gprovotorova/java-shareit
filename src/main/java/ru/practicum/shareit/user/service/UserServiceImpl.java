@@ -17,8 +17,8 @@ import ru.practicum.shareit.user.repository.UserRepository;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    @Autowired
-    private UserRepository userRepository;
+
+    private final UserRepository userRepository;
 
     @Override
     public List<UserDto> getAllUsers() {
@@ -31,7 +31,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto createUser(UserDto userDto) {
         User user = UserMapper.toUser(userDto);
-        try{
+        try {
             userRepository.save(user);
         } catch (ObjectExistException e) {
             throw new ObjectExistException("User with this email already exists.");

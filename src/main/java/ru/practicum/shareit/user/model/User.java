@@ -33,6 +33,6 @@ public class User {
 
     @Email(groups = {Create.class, Update.class}, message = "Invalid email address.")
     @NotNull(groups = {Create.class}, message = "Email address cannot be empty.")
-    @Column(name = "email",unique = true, nullable = false)
+    @Column(name = "email", unique = true, nullable = false)
     private String email;
 }
