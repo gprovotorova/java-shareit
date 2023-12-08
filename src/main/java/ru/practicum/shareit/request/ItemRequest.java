@@ -14,7 +14,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.JoinColumn;
 import java.time.LocalDateTime;
 
-
 @Data
 @NoArgsConstructor
 @Entity

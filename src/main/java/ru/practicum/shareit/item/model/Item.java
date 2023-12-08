@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.common.Create;
 import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
@@ -22,8 +21,6 @@ import javax.persistence.OneToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.CascadeType;
 import javax.persistence.FetchType;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -40,18 +37,12 @@ public class Item {
     @Column(name = "id")
     private Long id;
 
-    //@NotNull(groups = {Create.class})
-    //@NotBlank(groups = {Create.class})
     @Column(name = "name", nullable = false)
     private String name;
 
-    //@NotNull(groups = {Create.class})
-    //@NotBlank(groups = {Create.class})
     @Column(name = "description", nullable = false)
     private String description;
 
-    //@NotNull(groups = {Create.class})
-    //@NotBlank(groups = {Create.class})
     @Column(name = "available")
     private Boolean available;
 

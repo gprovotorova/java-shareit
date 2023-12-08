@@ -9,5 +9,6 @@ import java.util.List;
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
     List<Comment> getByItem_IdOrderByCreatedDesc(Long id);
+
     List<Comment> findByItemId(Long itemId);
 }

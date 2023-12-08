@@ -50,8 +50,8 @@ public class BookingController {
 
     @GetMapping
     public List<BookingDto> getAllByUser(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                   @RequestParam(value = "state", required = false,
-                                           defaultValue = "ALL") String state) {
+                                         @RequestParam(value = "state", required = false,
+                                                 defaultValue = "ALL") String state) {
         return bookingService.getAllBookingByUserId(userId, state);
     }
 

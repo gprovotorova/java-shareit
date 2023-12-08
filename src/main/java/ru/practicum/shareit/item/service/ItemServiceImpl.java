@@ -1,8 +1,6 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.enums.BookingStatus;
@@ -23,12 +21,10 @@ import ru.practicum.shareit.comments.repository.CommentRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 import static ru.practicum.shareit.item.mapper.ItemMapper.toItemDto;
@@ -88,7 +84,7 @@ public class ItemServiceImpl implements ItemService {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new ObjectNotFoundException("Item with id=" + itemId + " not found."));
         List<Comment> comments = getReviewsByItemId(item);
-        if(item.getOwner().getId().equals(userId)){
+        if (item.getOwner().getId().equals(userId)) {
             Booking lastBooking =
                     bookingRepository.getFirstByItemIdAndStatusNotAndStartBeforeOrderByEndDesc(itemId,
                             BookingStatus.REJECTED, LocalDateTime.now());
@@ -122,9 +118,7 @@ public class ItemServiceImpl implements ItemService {
             return new ArrayList<>();
         }
 
-        List <Item> items2 = itemRepository.findAll();
-
-        List <ItemDto> items = itemRepository.searchByQuery(text)
+        List<ItemDto> items = itemRepository.searchByQuery(text)
                 .stream()
                 .map(ItemMapper::toItemDto)
                 .collect(Collectors.toList());

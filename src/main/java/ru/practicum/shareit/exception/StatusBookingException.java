@@ -4,6 +4,7 @@ public class StatusBookingException extends RuntimeException {
     public StatusBookingException(String message) {
         super(message);
     }
+
     public StatusBookingException(String message, Throwable cause) {
         super(message, cause);
     }

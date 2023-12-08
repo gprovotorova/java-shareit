@@ -1,6 +1,5 @@
 package ru.practicum.shareit.exception.error;
 
-
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
