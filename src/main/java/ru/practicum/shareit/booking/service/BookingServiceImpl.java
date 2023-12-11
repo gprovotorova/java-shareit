@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class BookingServiceImpl implements BookingService {
 
     private final UserRepository userRepository;
@@ -30,6 +29,7 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public BookingDto getBookingById(Long userId, Long bookingId) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new ObjectNotFoundException("Booking with id= " + bookingId + " not found"));
@@ -41,6 +41,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional
     public BookingDto createBooking(BookingDto bookingDto, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ObjectNotFoundException("User with id= " + userId + " not found."));
@@ -71,6 +72,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional
     public BookingDto updateBooking(Long bookingId, Long userId, Boolean approved) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new ObjectNotFoundException("Booking with id= " + bookingId + " not found."));
@@ -94,6 +96,7 @@ public class BookingServiceImpl implements BookingService {
 
 
     @Override
+    @Transactional(readOnly = true)
     public List<BookingDto> getAllBookingByUserId(Long userId, String stateName) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new ObjectNotFoundException("User with id= " + userId + " not found."));
@@ -132,6 +135,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<BookingDto> getAllBookingByOwnerId(Long userId, String stateName) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new ObjectNotFoundException("Owner with id= " + userId + " not found"));

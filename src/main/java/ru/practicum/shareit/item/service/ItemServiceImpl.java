@@ -31,7 +31,6 @@ import static ru.practicum.shareit.item.mapper.ItemMapper.toItemDto;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
@@ -40,6 +39,7 @@ public class ItemServiceImpl implements ItemService {
     private final CommentRepository commentRepository;
 
     @Override
+    @Transactional
     public ItemDto createItem(ItemDto itemDto, long userId) {
         if (itemDto.getName() == null || itemDto.getName().isBlank()) {
             throw new ObjectValidationException("Name is empty.");
@@ -58,6 +58,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public ItemDto updateItem(ItemDto itemDto, long userId, long itemId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ObjectNotFoundException("User with id=" + userId + " not found."));
@@ -80,6 +81,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ItemDtoWithBooking getItemById(long userId, long itemId) {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new ObjectNotFoundException("Item with id=" + itemId + " not found."));
@@ -97,6 +99,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ItemDtoWithBooking> getItemsByUser(Long userId) {
         LocalDateTime dateTime = LocalDateTime.now();
         return itemRepository.findByOwnerIdOrderByIdAsc(userId)
@@ -113,6 +116,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ItemDto> searchItemByQuery(Long userId, String text) {
         if (text.isEmpty() || text.isBlank()) {
             return new ArrayList<>();
@@ -126,6 +130,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public CommentDto addComment(Long userId, Long itemId, CommentDto commentDto) {
         if (commentDto.getText().isEmpty() || commentDto.getText().isBlank()) {
             throw new ObjectValidationException("This comment is empty.");

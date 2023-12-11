@@ -1,9 +1,6 @@
 package ru.practicum.shareit.comments.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
@@ -33,10 +30,12 @@ public class Comment {
     private String text;
 
     @ManyToOne
+    @ToString.Exclude
     @JoinColumn(name = "item_id", nullable = false)
     private Item item;
 
     @ManyToOne
+    @ToString.Exclude
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 

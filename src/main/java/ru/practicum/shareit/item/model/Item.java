@@ -1,10 +1,7 @@
 package ru.practicum.shareit.item.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.model.User;
@@ -47,10 +44,12 @@ public class Item {
     private Boolean available;
 
     @ManyToOne
+    @ToString.Exclude
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
 
     @OneToOne
+    @ToString.Exclude
     @JoinColumn(name = "request_id")
     private ItemRequest request;
 
@@ -58,6 +57,7 @@ public class Item {
             orphanRemoval = true,
             cascade = CascadeType.REMOVE,
             fetch = FetchType.LAZY)
+    @ToString.Exclude
     @JsonIgnore
     private Set<Booking> booking = new HashSet<>();
 }

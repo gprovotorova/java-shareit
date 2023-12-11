@@ -1,9 +1,6 @@
 package ru.practicum.shareit.booking.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import ru.practicum.shareit.booking.enums.BookingStatus;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
@@ -41,10 +38,12 @@ public class Booking {
     private LocalDateTime end;
 
     @ManyToOne
+    @ToString.Exclude
     @JoinColumn(name = "item_id", nullable = false)
     private Item item;
 
     @ManyToOne
+    @ToString.Exclude
     @JoinColumn(name = "booker_id", nullable = false)
     private User booker;
 
