@@ -1,8 +1,7 @@
 package ru.practicum.shareit.user.controller;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,23 +16,16 @@ import ru.practicum.shareit.common.Create;
 import ru.practicum.shareit.common.Update;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.service.UserServiceImpl;
-import ru.practicum.shareit.user.service.ValidateService;
 
 import java.util.List;
 
-/**
- * TODO Sprint add-controllers.
- */
 @RestController
 @RequestMapping("/users")
 @Slf4j
-@RequiredArgsConstructor
+@AllArgsConstructor
 @Validated
 public class UserController {
 
-    @Autowired
-    private ValidateService validateService;
-    @Autowired
     private final UserServiceImpl userService;
 
     @GetMapping("/{userId}")
@@ -51,15 +43,13 @@ public class UserController {
     @PostMapping
     public UserDto createUser(@Validated({Create.class}) @RequestBody UserDto userDto) {
         log.info("Creating user {}", userDto);
-        validateService.userEmailValidation(userDto);
         return userService.createUser(userDto);
     }
 
     @PatchMapping("/{userId}")
     public UserDto update(@Validated({Update.class}) @PathVariable long userId, @RequestBody UserDto userDto) {
-        userDto.setId(userId);
         log.info("Updating user {}", userDto);
-        return userService.updateUser(userDto);
+        return userService.updateUser(userDto, userId);
     }
 
     @DeleteMapping("/{userId}")
