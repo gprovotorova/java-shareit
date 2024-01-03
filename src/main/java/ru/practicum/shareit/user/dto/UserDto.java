@@ -1,6 +1,7 @@
 package ru.practicum.shareit.user.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.shareit.common.Create;
@@ -12,10 +13,11 @@ import javax.validation.constraints.NotNull;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class UserDto {
     private Long id;
 
-    @NotNull(groups = {Create.class})
+    @NotNull(groups = {Create.class}, message = "User name cannot be empty.")
     private String name;
 
     @Email(groups = {Create.class, Update.class}, message = "Invalid email address.")

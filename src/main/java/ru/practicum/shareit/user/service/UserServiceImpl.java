@@ -3,10 +3,10 @@ package ru.practicum.shareit.user.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
+import ru.practicum.shareit.exception.ObjectExistException;
 import ru.practicum.shareit.exception.ObjectNotFoundException;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.dto.UserDto;
@@ -16,12 +16,12 @@ import ru.practicum.shareit.user.repository.UserRepository;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    @Autowired
-    UserRepository userRepository;
+
+    private final UserRepository userRepository;
 
     @Override
     public List<UserDto> getAllUsers() {
-        return userRepository.getAllUsers()
+        return userRepository.findAll()
                 .stream()
                 .map(UserMapper::toUserDto)
                 .collect(Collectors.toList());
@@ -29,30 +29,30 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto createUser(UserDto userDto) {
-        final User user = UserMapper.toUser(userDto);
-        userRepository.save(user);
+        User user = UserMapper.toUser(userDto);
+        try {
+            userRepository.save(user);
+        } catch (ObjectExistException e) {
+            throw new ObjectExistException("User with this email already exists.");
+        }
         return UserMapper.toUserDto(user);
     }
 
     @Override
-    public UserDto updateUser(UserDto userDto) {
-        final User newUser = UserMapper.toUser(userDto);
-
-        final User user = userRepository.findById(newUser.getUserId())
-                .orElseThrow(() -> new ObjectNotFoundException("User with id=" + newUser.getUserId() + " not found"));
-
-        if (newUser.getName() == null) {
-            newUser.setName(user.getName());
+    public UserDto updateUser(UserDto userDto, Long userId) {
+        User updatedUser = UserMapper.toUser(getUser(userId));
+        if (userDto.getEmail() != null && !userDto.getEmail().isBlank()) {
+            updatedUser.setEmail(userDto.getEmail());
         }
-        if (newUser.getEmail() == null) {
-            newUser.setEmail(user.getEmail());
+        if (userDto.getName() != null && !userDto.getName().isBlank()) {
+            updatedUser.setName(userDto.getName());
         }
-        userRepository.update(newUser);
-        return UserMapper.toUserDto(newUser);
+        userRepository.save(updatedUser);
+        return UserMapper.toUserDto(updatedUser);
     }
 
     @Override
-    public UserDto getUser(long userId) {
+    public UserDto getUser(Long userId) {
         return UserMapper.toUserDto(userRepository.findById(userId)
                 .orElseThrow(() ->
                         new ObjectNotFoundException("User with id=" + userId + " not found")));
@@ -60,8 +60,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteUser(long userId) {
+    public void deleteUser(Long userId) {
         userRepository.findById(userId)
-                .ifPresent(user -> userRepository.delete(userId));
+                .ifPresent(user -> userRepository.deleteById(userId));
     }
 }
