@@ -1,51 +1,22 @@
 package ru.practicum.shareit.item.repository;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.item.model.Item;
 
-import java.util.Optional;
-import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
-@Component
-@RequiredArgsConstructor
-public class ItemRepository {
-    private final Map<Long, Item> items = new HashMap<>();
-    private Long id = 0L;
+@Repository
+public interface ItemRepository extends JpaRepository<Item, Long> {
 
-    public void save(Item item) {
-        item.setItemId(++id);
-        items.put(item.getItemId(), item);
-    }
+    Collection<Item> findByOwnerIdOrderByIdAsc(Long userId);
 
-    public void update(Item item) {
-        items.put(item.getItemId(), item);
-    }
+    @Query("select i from Item as i " +
+            "where i.available = true " +
+            "and (upper(i.name) like upper(concat('%', :query,'%')) " +
+            "or upper(i.description) like upper(concat('%',:query,'%')))")
 
-    public List<Item> getAllItemsByUser(long userId) {
-        return items.values().stream()
-                .filter(item -> item
-                        .getOwner().getUserId().equals(userId))
-                .collect(Collectors.toList());
-    }
-
-    public Optional<Item> findById(Long itemId) {
-        return Optional.ofNullable(items.get(itemId));
-    }
-
-    public List<Item> search(String text) {
-        return items.values().stream()
-                .filter(Item::getAvailable)
-                .filter(item -> (item.getName().toLowerCase().contains(text.toLowerCase())
-                        || item.getDescription().toLowerCase().contains(text.toLowerCase())))
-                .collect(Collectors.toList());
-    }
-
-    public List<Item> getAll() {
-        return new ArrayList<>(items.values());
-    }
+    List<Item> searchByQuery(String query);
 }

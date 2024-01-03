@@ -15,7 +15,7 @@ import javax.validation.constraints.NotNull;
 public class UserDto {
     private Long id;
 
-    @NotNull(groups = {Create.class})
+    @NotNull(groups = {Create.class}, message = "User name cannot be empty.")
     private String name;
 
     @Email(groups = {Create.class, Update.class}, message = "Invalid email address.")
