@@ -39,7 +39,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto updateUser(UserDto userDto, long userId) {
+    public UserDto updateUser(UserDto userDto, Long userId) {
         User updatedUser = UserMapper.toUser(getUser(userId));
         if (userDto.getEmail() != null && !userDto.getEmail().isBlank()) {
             updatedUser.setEmail(userDto.getEmail());
@@ -52,7 +52,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto getUser(long userId) {
+    public UserDto getUser(Long userId) {
         return UserMapper.toUserDto(userRepository.findById(userId)
                 .orElseThrow(() ->
                         new ObjectNotFoundException("User with id=" + userId + " not found")));
@@ -60,7 +60,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteUser(long userId) {
+    public void deleteUser(Long userId) {
         userRepository.findById(userId)
                 .ifPresent(user -> userRepository.deleteById(userId));
     }

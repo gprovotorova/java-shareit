@@ -13,9 +13,9 @@ public interface ItemService {
 
     ItemDtoWithBooking getItemById(long userId, long itemId);
 
-    List<ItemDtoWithBooking> getItemsByUser(Long userId);
+    List<ItemDtoWithBooking> getItemsByUser(Long userId, Integer from, Integer size);
 
-    List<ItemDto> searchItemByQuery(Long userId, String text);
+    List<ItemDto> searchItemByQuery(Long userId, String text, Integer from, Integer size);
 
     CommentDto addComment(Long userId, Long itemId, CommentDto commentDto);
 }

@@ -1,6 +1,6 @@
 package ru.practicum.shareit.booking.controller;
 
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,7 +20,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping(path = "/bookings")
-@AllArgsConstructor
+@RequiredArgsConstructor
 @Slf4j
 public class BookingController {
 
@@ -51,14 +51,18 @@ public class BookingController {
     @GetMapping
     public List<BookingDto> getAllByUser(@RequestHeader("X-Sharer-User-Id") Long userId,
                                          @RequestParam(value = "state", required = false,
-                                                 defaultValue = "ALL") String state) {
-        return bookingService.getAllBookingByUserId(userId, state);
+                                                 defaultValue = "ALL") String state,
+                                         @RequestParam(required = false) Integer from,
+                                         @RequestParam(required = false) Integer size) {
+        return bookingService.getAllBookingByUserId(userId, state, from, size);
     }
 
     @GetMapping("/owner")
     public List<BookingDto> getAllByOwner(@RequestHeader("X-Sharer-User-Id") Long userId,
                                           @RequestParam(value = "state", required = false,
-                                                  defaultValue = "ALL") String state) {
-        return bookingService.getAllBookingByOwnerId(userId, state);
+                                                  defaultValue = "ALL") String state,
+                                          @RequestParam(required = false) Integer from,
+                                          @RequestParam(required = false) Integer size) {
+        return bookingService.getAllBookingByOwnerId(userId, state, from, size);
     }
 }
