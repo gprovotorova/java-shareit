@@ -64,7 +64,7 @@ public class RequestServiceTest {
     @Test
     void getRequestsByOwner_shouldReturnRequests() {
         UserDto user = userService.createUser(firstUser);
-        ItemRequestDto itemRequestDto = requestService.createRequest( requestDto, user.getId(),
+        ItemRequestDto itemRequestDto = requestService.createRequest(requestDto, user.getId(),
                 LocalDateTime.of(2023, 12, 28, 22, 40, 0));
         List<ItemRequestDto> returnedRequest = requestService.getRequestsByOwner(user.getId());
 
@@ -100,7 +100,7 @@ public class RequestServiceTest {
     void getExistingRequests_shouldReturnExistingRequestsIfSizeIsNull() {
         UserDto firstUserDto = userService.createUser(firstUser);
         UserDto secondUserDto = userService.createUser(secondUser);
-        ItemRequestDto itemRequestDto = requestService.createRequest( requestDto, firstUserDto.getId(),
+        ItemRequestDto itemRequestDto = requestService.createRequest(requestDto, firstUserDto.getId(),
                 LocalDateTime.of(2023, 12, 28, 22, 40, 0));
         List<ItemRequestDto> returnedRequest = requestService.getAllRequests(secondUserDto.getId(), 0, null);
 

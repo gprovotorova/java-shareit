@@ -203,24 +203,18 @@ public class BookingServiceImpl implements BookingService {
             switch (stateName) {
                 case "ALL":
                     return bookingRepository.getAllBookingsForOwnersItems(userId, page);
-                    //break;
                 case "CURRENT":
                     return bookingRepository.getCurrentBookingsForOwnersItems(userId, dateTime, dateTime, page);
-                    //break;
                 case "PAST":
                     return bookingRepository.getPastBookingsForOwnersItems(userId, dateTime, page);
-                    //break;
                 case "FUTURE":
                     return bookingRepository.getFutureBookingsForOwnersItems(userId, dateTime, page);
-                    //break;
                 case "WAITING":
                     return bookingRepository.getBookingsForOwnersWithStatusContaining(userId, BookingStatus.WAITING,
                             page);
-                    //break;
                 case "REJECTED":
                     return bookingRepository.getBookingsForOwnersWithStatusContaining(userId, BookingStatus.REJECTED,
                             page);
-                    //break;
                 default:
                     throw new StatusBookingException(String.format("Unknown state: %s", stateName));
             }

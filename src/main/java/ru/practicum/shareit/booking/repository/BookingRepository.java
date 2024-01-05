@@ -1,11 +1,9 @@
 package ru.practicum.shareit.booking.repository;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.booking.enums.BookingStatus;
 import ru.practicum.shareit.booking.model.Booking;
@@ -195,6 +193,4 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     Booking getFirstByItemIdAndStatusNotAndStartAfterOrderByStart(long itemId, BookingStatus status,
                                                                   LocalDateTime date);
-
-
 }

@@ -7,11 +7,8 @@ import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import org.springframework.boot.test.json.JacksonTester;
 import org.springframework.boot.test.json.JsonContent;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
-import ru.practicum.shareit.request.mapper.ItemRequestMapper;
-import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
-import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalDateTime;
 
