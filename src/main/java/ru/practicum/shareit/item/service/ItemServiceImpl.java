@@ -1,11 +1,15 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.enums.BookingStatus;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
+import ru.practicum.shareit.exception.InvalidPathVariableException;
 import ru.practicum.shareit.exception.ObjectNotFoundException;
 import ru.practicum.shareit.exception.ObjectValidationException;
 import ru.practicum.shareit.item.dto.ItemDtoWithBooking;
@@ -25,6 +29,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 import static ru.practicum.shareit.item.mapper.ItemMapper.toItemDto;
@@ -100,11 +105,21 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemDtoWithBooking> getItemsByUser(Long userId) {
+    public List<ItemDtoWithBooking> getItemsByUser(Long userId, Integer from, Integer size) {
         LocalDateTime dateTime = LocalDateTime.now();
-        return itemRepository.findByOwnerIdOrderByIdAsc(userId)
-                .stream()
-                .map(item -> {
+        userRepository.findById(userId)
+                .orElseThrow(() -> new ObjectNotFoundException("User with id=" + userId + " not found."));
+        Stream<Item> items;
+        if (from == null || size == null) {
+            items = itemRepository.findByOwnerIdOrderByIdAsc(userId).stream();
+        } else if (from < 0 || size <= 0) {
+            throw new InvalidPathVariableException("Incorrect page parameters");
+        } else {
+            int pageNumber = from / size;
+            final Pageable page = PageRequest.of(pageNumber, size, Sort.by(Sort.Direction.ASC, "id"));
+            items = itemRepository.findByOwnerIdOrderByIdAsc(userId, page).get();
+        }
+        return items.map(item -> {
                     List<Comment> comments = getReviewsByItemId(item);
                     Booking lastBooking =
                             bookingRepository.getFirstByItemIdAndEndBeforeOrderByEndDesc(item.getId(), dateTime);
@@ -117,16 +132,27 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemDto> searchItemByQuery(Long userId, String text) {
+    public List<ItemDto> searchItemByQuery(Long userId, String text, Integer from, Integer size) {
         if (text.isEmpty() || text.isBlank()) {
             return new ArrayList<>();
         }
-
-        List<ItemDto> items = itemRepository.searchByQuery(text)
-                .stream()
-                .map(ItemMapper::toItemDto)
-                .collect(Collectors.toList());
-        return items;
+        userRepository.findById(userId)
+                .orElseThrow(() -> new ObjectNotFoundException("User with id=" + userId + " not found."));
+        if (from == null || size == null) {
+            return itemRepository.searchByQuery(text)
+                    .stream()
+                    .map(ItemMapper::toItemDto)
+                    .collect(Collectors.toList());
+        } else if (from < 0 || size <= 0) {
+            throw new InvalidPathVariableException("Incorrect page parameters");
+        } else {
+            int pageNumber = from / size;
+            final Pageable page = PageRequest.of(pageNumber, size, Sort.by(Sort.Direction.ASC, "id"));
+            return itemRepository.searchByQuery(text, page)
+                    .stream()
+                    .map(ItemMapper::toItemDto)
+                    .collect(Collectors.toList());
+        }
     }
 
     @Override

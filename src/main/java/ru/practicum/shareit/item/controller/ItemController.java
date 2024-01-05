@@ -50,15 +50,20 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDtoWithBooking> getItemsByUser(@RequestHeader("X-Sharer-User-Id") long userId) {
+    public List<ItemDtoWithBooking> getItemsByUser(@RequestHeader("X-Sharer-User-Id") long userId,
+                                                   @RequestParam(required = false) Integer from,
+                                                   @RequestParam(required = false) Integer size) {
         log.info("Get all items user={}", userId);
-        return itemService.getItemsByUser(userId);
+        return itemService.getItemsByUser(userId, from, size);
     }
 
     @GetMapping("/search")
-    public List<ItemDto> searchItemByQuery(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestParam String text) {
+    public List<ItemDto> searchItemByQuery(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                           @RequestParam String text,
+                                           @RequestParam(required = false) Integer from,
+                                           @RequestParam(required = false) Integer size) {
         log.info("Search item text={}", text);
-        return itemService.searchItemByQuery(userId, text);
+        return itemService.searchItemByQuery(userId, text, from, size);
     }
 
     @PostMapping("/{itemId}/comment")

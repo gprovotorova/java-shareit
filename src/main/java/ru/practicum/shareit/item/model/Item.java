@@ -1,9 +1,12 @@
 package ru.practicum.shareit.item.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import ru.practicum.shareit.booking.model.Booking;
-import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
 import javax.persistence.Entity;
@@ -14,7 +17,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Column;
 import javax.persistence.ManyToOne;
 import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.CascadeType;
 import javax.persistence.FetchType;
@@ -48,10 +50,8 @@ public class Item {
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
 
-    @OneToOne
-    @ToString.Exclude
-    @JoinColumn(name = "request_id")
-    private ItemRequest request;
+    @Column(name = "request_id")
+    private Long requestId;
 
     @OneToMany(mappedBy = "item",
             orphanRemoval = true,

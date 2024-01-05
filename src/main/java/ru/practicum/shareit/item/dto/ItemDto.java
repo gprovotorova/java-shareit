@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.shareit.common.Create;
-import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.model.User;
 
 import javax.validation.constraints.NotBlank;
@@ -29,5 +28,6 @@ public class ItemDto {
     private Boolean available;
 
     private User owner;
-    private ItemRequest request;
+
+    private Long requestId;
 }
