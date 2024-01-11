@@ -15,21 +15,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @JsonTest
 public class BookingDtoTest {
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     private JacksonTester<BookingDto> json;
-    private final BookingDto.Item item = new BookingDto.Item(
-            1L,
-            "Book");
-    private final BookingDto.User user = new BookingDto.User(
-            1L,
-            "Anna");
+
+    private static final LocalDateTime DATE =
+            LocalDateTime.of(2023, 12, 10, 12, 30, 0);
     private final BookingDto booking = new BookingDto(
             1L,
-            LocalDateTime.of(2023, 12, 10, 10, 50, 0),
-            LocalDateTime.of(2023, 12, 29, 12, 10, 0),
-            item,
+            DATE,
+            DATE.plusDays(2),
+            new BookingDto.Item(
+                    1L,
+                    "Book"),
             1L,
-            user,
+            new BookingDto.User(
+                    1L,
+                    "Anna"),
             BookingStatus.WAITING);
 
     @SneakyThrows
@@ -39,11 +41,11 @@ public class BookingDtoTest {
 
         assertThat(result).extractingJsonPathNumberValue("$.id").isEqualTo(1);
         assertThat(result).extractingJsonPathStringValue("$.start")
-                .isEqualTo("2023-12-10T10:50:00");
+                .isEqualTo("2023-12-10T12:30:00");
         assertThat(result).extractingJsonPathStringValue("$.end")
-                .isEqualTo("2023-12-29T12:10:00");
+                .isEqualTo("2023-12-12T12:30:00");
         assertThat(result).extractingJsonPathStringValue("$.status").isEqualTo("WAITING");
-        assertThat(result).extractingJsonPathNumberValue("$.user.id").isEqualTo(1);
+        assertThat(result).extractingJsonPathNumberValue("$.booker.id").isEqualTo(1);
         assertThat(result).extractingJsonPathStringValue("$.booker.name").isEqualTo("Anna");
         assertThat(result).extractingJsonPathNumberValue("$.item.id").isEqualTo(1);
         assertThat(result).extractingJsonPathStringValue("$.item.name").isEqualTo("Book");

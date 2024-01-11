@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import ru.practicum.shareit.common.Create;
 import ru.practicum.shareit.item.dto.ItemDtoWithBooking;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.service.ItemServiceImpl;
+import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.comments.dto.CommentDto;
 
 import java.util.List;
@@ -26,7 +26,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ItemController {
 
-    private final ItemServiceImpl itemService;
+    private final ItemService itemService;
 
     @PostMapping
     public ItemDto create(@Validated({Create.class}) @RequestHeader("X-Sharer-User-Id") long userId,

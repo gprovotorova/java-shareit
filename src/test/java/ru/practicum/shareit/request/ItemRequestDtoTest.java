@@ -15,20 +15,25 @@ import java.time.LocalDateTime;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @JsonTest
-public class RequestDtoTest {
+public class ItemRequestDtoTest {
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     private JacksonTester<ItemRequestDto> json;
 
-    private final UserDto userDto = new UserDto(
+    private static final LocalDateTime DATE =
+            LocalDateTime.of(2023, 12, 10, 12, 30, 0);
+    private UserDto userDto = new UserDto(
             2L,
             "Ivan",
-            "ivan@mail.ru");
-    private final ItemRequestDto request = new ItemRequestDto(
+            "ivan@mail.ru"
+    );
+    private ItemRequestDto request = new ItemRequestDto(
             1L,
             "I'm looking for a table",
             UserMapper.toUser(userDto),
-            LocalDateTime.of(2023, 12, 29, 12, 0, 0),
-            null);
+            DATE,
+            null
+    );
 
     @SneakyThrows
     @Test
@@ -43,7 +48,7 @@ public class RequestDtoTest {
         assertThat(result).extractingJsonPathStringValue("$.requester.email")
                 .isEqualTo("ivan@mail.ru");
         assertThat(result).extractingJsonPathStringValue("$.created")
-                .isEqualTo("2023-12-29T12:00:00");
+                .isEqualTo("2023-12-10T12:30:00");
         assertThat(result).extractingJsonPathArrayValue("$.items").isEqualTo(null);
     }
 }

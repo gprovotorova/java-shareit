@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.springframework.data.domain.Sort.Direction.DESC;
-import static ru.practicum.shareit.request.mapper.ItemRequestMapper.toItemRequestDtoWithItems;
+import static ru.practicum.shareit.request.mapper.ItemRequestMapper.toItemRequestDto;
 
 @Service
 @RequiredArgsConstructor
@@ -39,7 +39,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ObjectNotFoundException("User with id= " + userId + " not found."));
         ItemRequest request = ItemRequestMapper.toItemRequest(requestDto, user, date);
-        return toItemRequestDtoWithItems(requestRepository.save(request), new ArrayList<>());
+        return toItemRequestDto(requestRepository.save(request), new ArrayList<>());
     }
 
     @Override
@@ -47,9 +47,10 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     public List<ItemRequestDto> getRequestsByOwner(Long userId) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new ObjectNotFoundException("User with id= " + userId + " not found."));
-        return requestRepository.findAllByRequesterId(userId, Sort.by(DESC, "created"))
-                .stream()
-                .map(itemRequest -> ItemRequestMapper.toItemRequestDtoWithItems(itemRequest,
+        List<ItemRequest> requests = requestRepository.findAllByRequesterId(userId,
+                Sort.by(DESC, "created"));
+        return requests.stream()
+                .map(itemRequest -> ItemRequestMapper.toItemRequestDto(itemRequest,
                         ItemMapper.toItemDto(itemRepository.findByRequestId(itemRequest.getRequester().getId()))))
                 .collect(Collectors.toList());
     }
@@ -60,11 +61,12 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         userRepository.findById(userId)
                 .orElseThrow(() -> new ObjectNotFoundException("User with id= " + userId + " not found."));
         if (from == null || size == null) {
-            return requestRepository.findAllByRequesterId(userId, Sort.by(DESC, "created"))
+            List<ItemRequest> requests = requestRepository.findAllByRequesterId(userId,
+                    Sort.by(DESC, "created"));
+            return requests
                     .stream()
-                    .map(itemRequest -> ItemRequestMapper.toItemRequestDtoWithItems(itemRequest,
-                            ItemMapper.toItemDto(itemRepository
-                                    .findByRequestId(itemRequest.getRequester().getId()))))
+                    .map(itemRequest -> ItemRequestMapper.toItemRequestDto(itemRequest,
+                            ItemMapper.toItemDto(itemRepository.findByRequestId(itemRequest.getRequester().getId()))))
                     .collect(Collectors.toList());
         } else if (from < 0 || size <= 0) {
             throw new InvalidPathVariableException("Incorrect page parameters");
@@ -73,7 +75,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
             final Pageable page = PageRequest.of(pageNumber, size, Sort.by(DESC, "id"));
             return requestRepository.findByRequesterIdNot(userId, page)
                     .stream()
-                    .map(itemRequest -> ItemRequestMapper.toItemRequestDtoWithItems(itemRequest,
+                    .map(itemRequest -> ItemRequestMapper.toItemRequestDto(itemRequest,
                             ItemMapper.toItemDto(itemRepository.findByRequestId(itemRequest.getRequester().getId()))))
                     .collect(Collectors.toList());
         }
@@ -86,7 +88,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
                 .orElseThrow(() -> new ObjectNotFoundException("User with id= " + userId + " not found."));
         ItemRequest itemRequest = requestRepository.findById(requestId)
                 .orElseThrow(() -> new ObjectNotFoundException("Request with id= " + requestId + " not found."));
-        return ItemRequestMapper.toItemRequestDtoWithItems(itemRequest,
+        return ItemRequestMapper.toItemRequestDto(itemRequest,
                 ItemMapper.toItemDto(itemRepository.findByRequestId(itemRequest.getRequester().getId())));
     }
 }

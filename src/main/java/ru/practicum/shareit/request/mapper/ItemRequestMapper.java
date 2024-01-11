@@ -11,7 +11,7 @@ import java.util.List;
 
 @Component
 public class ItemRequestMapper {
-    public static ItemRequestDto toItemRequestDtoWithItems(ItemRequest request, List<ItemDto> items) {
+    public static ItemRequestDto toItemRequestDto(ItemRequest request, List<ItemDto> items) {
         return ItemRequestDto.builder()
                 .id(request.getId())
                 .description(request.getDescription())

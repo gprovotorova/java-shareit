@@ -14,6 +14,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @JsonTest
 public class CommentDtoTest {
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     private JacksonTester<CommentDto> json;
     private final CommentDto comment = new CommentDto(

@@ -28,26 +28,28 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = UserController.class)
 public class UserControllerTest {
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     private ObjectMapper mapper;
 
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     private MockMvc mvc;
 
     @MockBean
     private UserService userService;
 
-    private final UserDto galina = new UserDto(
+    private UserDto galina = new UserDto(
             1L,
             "Galina",
             "galina@mail.ru");
 
-    private final List<UserDto> listUserDto = List.of(
+    private List<UserDto> listUserDto = List.of(
             new UserDto(2L, "Anna", "anna@mail.ru"),
             new UserDto(3L, "Kate", "kate@mail.ru"));
 
-    @Test
     @SneakyThrows
+    @Test
     void createUser_shouldCreateUser() {
         when(userService.createUser(any()))
                 .thenReturn(galina);
@@ -63,8 +65,8 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.email", is(galina.getEmail())));
     }
 
-    @Test
     @SneakyThrows
+    @Test
     void getById_shouldFindUserById() {
         when(userService.getUser(any(Long.class)))
                 .thenReturn(galina);
@@ -77,15 +79,15 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.email", is(galina.getEmail())));
     }
 
-    @Test
     @SneakyThrows
+    @Test
     void deleteUser_shouldDeleteUserById() {
         mvc.perform(delete("/users/1"))
                 .andExpect(status().isOk());
     }
 
-    @Test
     @SneakyThrows
+    @Test
     void updateUser_shouldUpdateUserData() {
         when(userService.updateUser(any(), any()))
                 .thenReturn(galina);
@@ -102,8 +104,8 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.email", is(galina.getEmail())));
     }
 
-    @Test
     @SneakyThrows
+    @Test
     void getAllUsers_shouldReturnListOfUsers() {
         when(userService.getAllUsers())
                 .thenReturn(listUserDto);

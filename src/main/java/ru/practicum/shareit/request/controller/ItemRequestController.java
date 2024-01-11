@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.PathVariable;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
-import ru.practicum.shareit.request.service.ItemRequestServiceImpl;
+import ru.practicum.shareit.request.service.ItemRequestService;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,7 +23,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ItemRequestController {
 
-    private final ItemRequestServiceImpl requestService;
+    private final ItemRequestService requestService;
 
     @PostMapping
     public ItemRequestDto save(@RequestHeader("X-Sharer-User-Id") Long userId,

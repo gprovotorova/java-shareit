@@ -99,7 +99,6 @@ public class BookingServiceImpl implements BookingService {
         return BookingMapper.toBookingDto(bookingRepository.save(booking));
     }
 
-
     @Override
     @Transactional(readOnly = true)
     public List<BookingDto> getAllBookingByUserId(Long userId, String stateName, Integer from, Integer size) {

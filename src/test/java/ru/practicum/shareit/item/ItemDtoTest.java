@@ -12,6 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @JsonTest
 public class ItemDtoTest {
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     private JacksonTester<ItemDto> json;
     private final ItemDto itemDto = new ItemDto(

@@ -12,9 +12,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @JsonTest
 public class UserDtoTest {
+    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     private JacksonTester<UserDto> json;
-    private final UserDto galina = new UserDto(
+    private UserDto galina = new UserDto(
             1L,
             "Galina",
             "galina@mail.ru");

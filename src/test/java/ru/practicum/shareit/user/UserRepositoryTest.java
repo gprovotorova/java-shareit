@@ -33,7 +33,7 @@ public class UserRepositoryTest {
     private UserService userService;
     private final UserMapper mapper = new UserMapper();
 
-    private final UserDto galina = new UserDto(
+    private UserDto galina = new UserDto(
             1L,
             "Galina",
             "galina@mail.ru");
@@ -57,12 +57,12 @@ public class UserRepositoryTest {
 
     @Test
     void getById_shouldThrowExceptionIfUserIdIsInvalid() {
-        when(userRepository.findById(any(Long.class))) //anyLong
+        when(userRepository.findById(any(Long.class)))
                 .thenReturn(Optional.empty());
 
         final ObjectNotFoundException exception = assertThrows(
                 ObjectNotFoundException.class, () -> userService.getUser(100L));
-        assertEquals("User with id=" + galina.getId() + " not found", exception.getMessage());
+        assertEquals("User with id=" + 100 + " not found", exception.getMessage());
     }
 
     @Test
