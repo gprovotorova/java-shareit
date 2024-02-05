@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -26,33 +27,31 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@AutoConfigureMockMvc
 @WebMvcTest(controllers = UserController.class)
 public class UserControllerTest {
-    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     private ObjectMapper mapper;
 
-    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     private MockMvc mvc;
 
     @MockBean
     private UserService userService;
 
-    private UserDto galina = new UserDto(
+    private final UserDto galina = new UserDto(
             1L,
             "Galina",
             "galina@mail.ru");
 
-    private List<UserDto> listUserDto = List.of(
+    private final List<UserDto> listUserDto = List.of(
             new UserDto(2L, "Anna", "anna@mail.ru"),
             new UserDto(3L, "Kate", "kate@mail.ru"));
 
     @SneakyThrows
     @Test
     void createUser_shouldCreateUser() {
-        when(userService.createUser(any()))
-                .thenReturn(galina);
+        when(userService.createUser(any())).thenReturn(galina);
 
         mvc.perform(post("/users")
                         .content(mapper.writeValueAsString(galina))
@@ -68,8 +67,7 @@ public class UserControllerTest {
     @SneakyThrows
     @Test
     void getById_shouldFindUserById() {
-        when(userService.getUser(any(Long.class)))
-                .thenReturn(galina);
+        when(userService.getUser(any(Long.class))).thenReturn(galina);
 
         mvc.perform(get("/users/1"))
                 .andExpect(status().isOk())

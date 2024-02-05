@@ -12,7 +12,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @JsonTest
 public class ItemDtoTest {
-    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     private JacksonTester<ItemDto> json;
     private final ItemDto itemDto = new ItemDto(
@@ -28,7 +27,7 @@ public class ItemDtoTest {
     void testItemShortDto() {
         JsonContent<ItemDto> result = json.write(itemDto);
 
-        assertThat(result).extractingJsonPathNumberValue("$.id").isEqualTo(2);
+        assertThat(result).extractingJsonPathNumberValue("$.id").isEqualTo(1);
         assertThat(result).extractingJsonPathStringValue("$.name").isEqualTo("Notebook");
         assertThat(result).extractingJsonPathStringValue("$.description")
                 .isEqualTo("Notebook description");

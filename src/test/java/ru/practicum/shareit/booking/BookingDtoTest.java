@@ -15,7 +15,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @JsonTest
 public class BookingDtoTest {
-    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     private JacksonTester<BookingDto> json;
 

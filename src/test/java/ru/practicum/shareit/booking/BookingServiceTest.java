@@ -32,6 +32,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -50,16 +51,15 @@ public class BookingServiceTest {
     @InjectMocks
     private BookingServiceImpl bookingService;
 
-    private final static String STATE_ALL = "ALL";
-    private final static String STATE_CURRENT = "CURRENT";
-    private final static String STATE_PAST = "PAST";
+    private static final String STATE_ALL = "ALL";
+    private static final String STATE_CURRENT = "CURRENT";
+    private static final String STATE_PAST = "PAST";
     private static final String STATE_FUTURE = "FUTURE";
     private static final String STATE_WAITING = "WAITING";
     private static final String STATE_REJECTED = "REJECTED";
     private static final String UNKNOWN_STATE = "UNKNOWN STATE";
     private static final int FROM = 0;
     private static final int SIZE = 10;
-
     private static final LocalDateTime DATE = LocalDateTime.now();
 
     private final User galina = new User(
@@ -174,8 +174,8 @@ public class BookingServiceTest {
     @Transactional
     @Test
     void createBooking_shouldThrowExceptionIfEndIsBeforeStart() {
-        when(userRepository.findById(anyLong())).thenReturn(Optional.of(anna));
-        when(itemRepository.findById(anyLong())).thenReturn(Optional.of(book));
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(anna));
+        when(itemRepository.findById(any(Long.class))).thenReturn(Optional.of(book));
 
         assertThrows(ObjectValidationException.class,
                 () -> bookingService.createBooking(
@@ -197,11 +197,60 @@ public class BookingServiceTest {
 
     @Transactional
     @Test
+    void updateBooking_shouldThrowExceptionIfBookingStatusIsApproved() {
+        booking.setStatus(BookingStatus.APPROVED);
+
+        when(bookingRepository.findById(any(Long.class))).thenReturn(Optional.of(booking));
+        assertThrows(ObjectValidationException.class,
+                () -> bookingService.updateBooking(booking.getId(), galina.getId(), true));
+    }
+
+    @Transactional
+    @Test
+    void updateBooking_shouldThrowExceptionIfBookingStatusIsRejected() {
+        booking.setStatus(BookingStatus.REJECTED);
+
+        when(bookingRepository.findById(any(Long.class))).thenReturn(Optional.of(booking));
+        assertThrows(ObjectValidationException.class,
+                () -> bookingService.updateBooking(booking.getId(), galina.getId(), false));
+    }
+
+    @Transactional
+    @Test
     void updateBooking_shouldThrowExceptionIfNotOwnerUpdatingBookingStatus() {
         when(bookingRepository.findById(anyLong())).thenReturn(Optional.of(booking));
 
-        assertThrows(ObjectValidationException.class,
-                () -> bookingService.updateBooking(anna.getId(), 1L, true));
+        assertThrows(ObjectNotFoundException.class,
+                () -> bookingService.updateBooking(booking.getId(), anna.getId(), true));
+    }
+
+    @Transactional
+    @Test
+    void updateBooking_shouldUpdateBookingStatusToApproved() {
+        booking.setStatus(BookingStatus.WAITING);
+        when(bookingRepository.findById(anyLong())).thenReturn(Optional.of(booking));
+        when(bookingRepository.save(any(Booking.class))).thenReturn(booking);
+
+        BookingDto bookingDto = bookingService.updateBooking(booking.getId(), galina.getId(), true);
+
+        assertEquals(BookingStatus.APPROVED, bookingDto.getStatus());
+
+        verify(bookingRepository, times(1)).findById(any(Long.class));
+        verify(bookingRepository, times(1)).save(any(Booking.class));
+    }
+
+    @Transactional
+    @Test
+    void updateBooking_shouldUpdateBookingStatusToRejected() {
+        when(bookingRepository.findById(anyLong())).thenReturn(Optional.of(booking));
+        when(bookingRepository.save(any(Booking.class))).thenReturn(booking);
+
+        BookingDto bookingDto = bookingService.updateBooking(booking.getId(), galina.getId(), false);
+
+        assertEquals(BookingStatus.REJECTED, bookingDto.getStatus());
+
+        verify(bookingRepository, times(1)).findById(any(Long.class));
+        verify(bookingRepository, times(1)).save(any(Booking.class));
     }
 
     @Transactional
@@ -238,7 +287,7 @@ public class BookingServiceTest {
 
     @Transactional
     @Test
-    void getAllBookingByOwnerId_shouldReturnBookingIfSizeIsNull() {
+    void getAllBookingByOwnerId_shouldReturnBookingIfSizeIsNullAndStateIsAll() {
         when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(galina));
         when(bookingRepository.getAllByItemOwnerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
         when(bookingRepository.getAllBookingsForOwnersItems(any(Long.class))).thenReturn(List.of(booking));
@@ -250,6 +299,94 @@ public class BookingServiceTest {
 
         verify(userRepository, times(1)).findById(galina.getId());
     }
+
+    @Transactional
+    @Test
+    void getAllBookingByOwnerId_shouldReturnBookingIfSizeIsNullAndStateIsCurrent() {
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(galina));
+        when(bookingRepository.getAllByItemOwnerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
+
+        List<BookingDto> bookings =
+                bookingService.getAllBookingByOwnerId(galina.getId(), STATE_CURRENT, FROM, null);
+
+        assertNotNull(bookings, "List of bookings should not be null");
+        assertTrue(bookings.isEmpty(), "List of bookings should be empty");
+
+        verify(userRepository, times(1)).findById(galina.getId());
+    }
+
+    @Transactional
+    @Test
+    void getAllBookingByOwnerId_shouldReturnBookingIfSizeIsNullAndStateIsPast() {
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(galina));
+        when(bookingRepository.getAllByItemOwnerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
+
+        List<BookingDto> bookings =
+                bookingService.getAllBookingByOwnerId(galina.getId(), STATE_PAST, FROM, null);
+
+        assertNotNull(bookings, "List of bookings should not be null");
+        assertTrue(bookings.isEmpty(), "List of bookings should be empty");
+
+        verify(userRepository, times(1)).findById(galina.getId());
+    }
+
+    @Transactional
+    @Test
+    void getAllBookingByOwnerId_shouldReturnBookingIfSizeIsNullAndStateIsFuture() {
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(galina));
+        when(bookingRepository.getAllByItemOwnerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
+
+        List<BookingDto> bookings =
+                bookingService.getAllBookingByOwnerId(galina.getId(), STATE_FUTURE, FROM, null);
+
+        assertNotNull(bookings, "List of bookings should not be null");
+        assertTrue(bookings.isEmpty(), "List of bookings should be empty");
+
+        verify(userRepository, times(1)).findById(galina.getId());
+    }
+
+    @Transactional
+    @Test
+    void getAllBookingByOwnerId_shouldReturnBookingIfSizeIsNullAndStateIsWaiting() {
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(galina));
+        when(bookingRepository.getAllByItemOwnerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
+
+        List<BookingDto> bookings =
+                bookingService.getAllBookingByOwnerId(galina.getId(), STATE_WAITING, FROM, null);
+
+        assertNotNull(bookings, "List of bookings should not be null");
+        assertTrue(bookings.isEmpty(), "List of bookings should be empty");
+
+        verify(userRepository, times(1)).findById(galina.getId());
+    }
+
+    @Transactional
+    @Test
+    void getAllBookingByOwnerId_shouldReturnBookingIfSizeIsNullAndStateIsRejected() {
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(galina));
+        when(bookingRepository.getAllByItemOwnerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
+
+        List<BookingDto> bookings =
+                bookingService.getAllBookingByOwnerId(galina.getId(), STATE_REJECTED, FROM, null);
+
+        assertNotNull(bookings, "List of bookings should not be null");
+        assertTrue(bookings.isEmpty(), "List of bookings should be empty");
+
+        verify(userRepository, times(1)).findById(galina.getId());
+    }
+
+    @Transactional
+    @Test
+    void getAllBookingByOwnerId_shouldReturnBookingIfSizeIsNullAndUnknownState() {
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(galina));
+        when(bookingRepository.getAllByItemOwnerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
+
+        assertThrows(StatusBookingException.class,
+                () -> bookingService.getAllBookingByOwnerId(galina.getId(), UNKNOWN_STATE, FROM, null));
+
+        verify(userRepository, times(1)).findById(galina.getId());
+    }
+
 
     @Transactional
     @Test
@@ -389,7 +526,7 @@ public class BookingServiceTest {
 
     @Transactional
     @Test
-    void getAllBookingByUserId_shouldReturnBookingIfSizeIsNull() {
+    void getAllBookingByUserId_shouldReturnBookingIfSizeIsNullAndStateIsAll() {
         when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(anna));
         when(bookingRepository.getAllByBookerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
         when(bookingRepository.findByBookerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
@@ -402,6 +539,89 @@ public class BookingServiceTest {
 
         verify(userRepository, times(1)).findById(anna.getId());
     }
+
+    @Transactional
+    @Test
+    void getAllBookingByUserId_shouldReturnBookingIfSizeIsNullAndStateIsCurrent() {
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(anna));
+        when(bookingRepository.getAllByBookerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
+
+        List<BookingDto> bookings = bookingService.getAllBookingByUserId(anna.getId(), STATE_CURRENT, FROM, null);
+
+        assertNotNull(bookings, "List of bookings should not be null");
+        assertTrue(bookings.isEmpty(), "List of bookings should be empty");
+
+        verify(userRepository, times(1)).findById(anna.getId());
+    }
+
+    @Transactional
+    @Test
+    void getAllBookingByUserId_shouldReturnBookingIfSizeIsNullAndStateIsPast() {
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(anna));
+        when(bookingRepository.getAllByBookerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
+
+        List<BookingDto> bookings = bookingService.getAllBookingByUserId(anna.getId(), STATE_PAST, FROM, null);
+
+        assertNotNull(bookings, "List of bookings should not be null");
+        assertTrue(bookings.isEmpty(), "List of bookings should be empty");
+
+        verify(userRepository, times(1)).findById(anna.getId());
+    }
+
+    @Transactional
+    @Test
+    void getAllBookingByUserId_shouldReturnBookingIfSizeIsNullAndStateIsFuture() {
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(anna));
+        when(bookingRepository.getAllByBookerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
+
+        List<BookingDto> bookings = bookingService.getAllBookingByUserId(anna.getId(), STATE_FUTURE, FROM, null);
+
+        assertNotNull(bookings, "List of bookings should not be null");
+        assertTrue(bookings.isEmpty(), "List of bookings should be empty");
+
+        verify(userRepository, times(1)).findById(anna.getId());
+    }
+
+    @Transactional
+    @Test
+    void getAllBookingByUserId_shouldReturnBookingIfSizeIsNullAndStateIsWaiting() {
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(anna));
+        when(bookingRepository.getAllByBookerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
+
+        List<BookingDto> bookings = bookingService.getAllBookingByUserId(anna.getId(), STATE_WAITING, FROM, null);
+
+        assertNotNull(bookings, "List of bookings should not be null");
+        assertTrue(bookings.isEmpty(), "List of bookings should be empty");
+
+        verify(userRepository, times(1)).findById(anna.getId());
+    }
+
+    @Transactional
+    @Test
+    void getAllBookingByUserId_shouldReturnBookingIfSizeIsNullAndStateIsRejected() {
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(anna));
+        when(bookingRepository.getAllByBookerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
+
+        List<BookingDto> bookings = bookingService.getAllBookingByUserId(anna.getId(), STATE_REJECTED, FROM, null);
+
+        assertNotNull(bookings, "List of bookings should not be null");
+        assertTrue(bookings.isEmpty(), "List of bookings should be empty");
+
+        verify(userRepository, times(1)).findById(anna.getId());
+    }
+
+    @Transactional
+    @Test
+    void getAllBookingByUserId_shouldReturnBookingIfSizeIsNullAndUnknownState() {
+        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(anna));
+        when(bookingRepository.getAllByBookerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
+
+        assertThrows(StatusBookingException.class,
+                () -> bookingService.getAllBookingByUserId(anna.getId(), UNKNOWN_STATE, FROM, null));
+
+        verify(userRepository, times(1)).findById(anna.getId());
+    }
+
 
     @Transactional
     @Test
@@ -428,7 +648,8 @@ public class BookingServiceTest {
 
         when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(anna));
         when(bookingRepository.getAllByBookerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
-        when(bookingRepository.findCurrentBookingsByBookerId(any(Long.class), any(LocalDateTime.class), any(Pageable.class))).thenReturn(page);
+        when(bookingRepository.findCurrentBookingsByBookerId(any(Long.class), any(LocalDateTime.class),
+                any(Pageable.class))).thenReturn(page);
 
         List<BookingDto> bookings = bookingService.getAllBookingByUserId(anna.getId(), STATE_CURRENT, FROM, SIZE);
 
@@ -526,8 +747,8 @@ public class BookingServiceTest {
         when(bookingRepository.getAllByBookerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
 
         assertThrows(StatusBookingException.class,
-                () -> bookingService.getAllBookingByUserId(galina.getId(), UNKNOWN_STATE, FROM, SIZE));
+                () -> bookingService.getAllBookingByUserId(anna.getId(), UNKNOWN_STATE, FROM, SIZE));
 
-        verify(userRepository, times(1)).findById(galina.getId());
+        verify(userRepository, times(1)).findById(anna.getId());
     }
 }

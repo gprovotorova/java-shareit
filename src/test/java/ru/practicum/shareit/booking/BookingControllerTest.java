@@ -5,6 +5,7 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -27,23 +28,22 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@AutoConfigureMockMvc
 @WebMvcTest(BookingController.class)
 public class BookingControllerTest {
-    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     ObjectMapper objectMapper;
 
     @MockBean
     BookingService bookingService;
 
-    @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     private MockMvc mvc;
 
-    Long userId = 1L;
-    Long bookingId = 1L;
-    boolean approved = true;
-    private static final String State_ALL = "ALL";
+    private static final Long USER_ID = 1L;
+    private static final Long BOOKING_ID = 1L;
+    private static final boolean APPROVED = true;
+    private static final String STATE_ALL = "ALL";
     private static final int FROM = 0;
     private static final int SIZE = 10;
     private static final LocalDateTime DATE =
@@ -99,11 +99,11 @@ public class BookingControllerTest {
     @SneakyThrows
     @Test
     void createBooking_shouldCreateBooking() {
-        Mockito.when(bookingService.createBooking(bookingDto, userId)).thenReturn(bookingDto);
+        Mockito.when(bookingService.createBooking(bookingDto, USER_ID)).thenReturn(bookingDto);
 
         mvc.perform(
                         post("/bookings")
-                                .header("X-Sharer-User-Id", String.valueOf(userId))
+                                .header("X-Sharer-User-Id", String.valueOf(USER_ID))
                                 .content(objectMapper.writeValueAsString(bookingDto))
                                 .characterEncoding(StandardCharsets.UTF_8)
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -111,19 +111,19 @@ public class BookingControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(bookingDto)));
 
-        Mockito.verify(bookingService, Mockito.times(1)).createBooking(bookingDto, userId);
+        Mockito.verify(bookingService, Mockito.times(1)).createBooking(bookingDto, USER_ID);
         Mockito.verifyNoMoreInteractions(bookingService);
     }
 
     @SneakyThrows
     @Test
     void updateBooking_shouldUpdateBooking() {
-        Mockito.when(bookingService.updateBooking(bookingId, userId, approved)).thenReturn(bookingDto);
+        Mockito.when(bookingService.updateBooking(BOOKING_ID, USER_ID, APPROVED)).thenReturn(bookingDto);
 
         mvc.perform(
-                        patch("/bookings/{bookingId}", bookingId)
-                                .header("X-Sharer-User-Id", String.valueOf(userId))
-                                .param("approved", String.valueOf(approved))
+                        patch("/bookings/{bookingId}", BOOKING_ID)
+                                .header("X-Sharer-User-Id", String.valueOf(USER_ID))
+                                .param("approved", String.valueOf(APPROVED))
                                 .characterEncoding(StandardCharsets.UTF_8)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON))
@@ -131,37 +131,37 @@ public class BookingControllerTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(bookingDto)));
 
         Mockito.verify(bookingService, Mockito.times(1))
-                .updateBooking(bookingId, userId, approved);
+                .updateBooking(BOOKING_ID, USER_ID, APPROVED);
         Mockito.verifyNoMoreInteractions(bookingService);
     }
 
     @SneakyThrows
     @Test
     void getBookingById_shouldReturnBookingById() {
-        Mockito.when(bookingService.getBookingById(userId, bookingId)).thenReturn(bookingDto);
+        Mockito.when(bookingService.getBookingById(USER_ID, BOOKING_ID)).thenReturn(bookingDto);
 
         mvc.perform(
-                        get("/bookings/{bookingId}", bookingId)
-                                .header("X-Sharer-User-Id", String.valueOf(userId))
+                        get("/bookings/{bookingId}", BOOKING_ID)
+                                .header("X-Sharer-User-Id", String.valueOf(USER_ID))
                                 .characterEncoding(StandardCharsets.UTF_8)
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(bookingDto)));
 
-        Mockito.verify(bookingService, Mockito.times(1)).getBookingById(userId, bookingId);
+        Mockito.verify(bookingService, Mockito.times(1)).getBookingById(USER_ID, BOOKING_ID);
         Mockito.verifyNoMoreInteractions(bookingService);
     }
 
     @SneakyThrows
     @Test
     void getAllBookingByUserId_shouldReturnListOfBookingsByUserId() {
-        Mockito.when(bookingService.getAllBookingByUserId(userId, State_ALL, FROM, SIZE)).thenReturn(bookings);
+        Mockito.when(bookingService.getAllBookingByUserId(USER_ID, STATE_ALL, FROM, SIZE)).thenReturn(bookings);
 
         mvc.perform(
                         get("/bookings")
-                                .header("X-Sharer-User-Id", String.valueOf(userId))
-                                .param("state", State_ALL)
+                                .header("X-Sharer-User-Id", String.valueOf(USER_ID))
+                                .param("state", STATE_ALL)
                                 .param("from", String.valueOf(FROM))
                                 .param("size", String.valueOf(SIZE))
                                 .characterEncoding(StandardCharsets.UTF_8)
@@ -171,19 +171,19 @@ public class BookingControllerTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(bookings)));
 
         Mockito.verify(bookingService, Mockito.times(1))
-                .getAllBookingByUserId(userId, State_ALL, FROM, SIZE);
+                .getAllBookingByUserId(USER_ID, STATE_ALL, FROM, SIZE);
         Mockito.verifyNoMoreInteractions(bookingService);
     }
 
     @SneakyThrows
     @Test
     void getAllBookingByOwnerId_shouldReturnListOfBookingsByOwnerId() {
-        Mockito.when(bookingService.getAllBookingByOwnerId(userId, State_ALL, FROM, SIZE)).thenReturn(bookings);
+        Mockito.when(bookingService.getAllBookingByOwnerId(USER_ID, STATE_ALL, FROM, SIZE)).thenReturn(bookings);
 
         mvc.perform(
                         get("/bookings/owner")
-                                .header("X-Sharer-User-Id", String.valueOf(userId))
-                                .param("state", State_ALL)
+                                .header("X-Sharer-User-Id", String.valueOf(USER_ID))
+                                .param("state", STATE_ALL)
                                 .param("from", String.valueOf(FROM))
                                 .param("size", String.valueOf(SIZE))
                                 .characterEncoding(StandardCharsets.UTF_8)
@@ -193,7 +193,7 @@ public class BookingControllerTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(bookings)));
 
         Mockito.verify(bookingService, Mockito.times(1))
-                .getAllBookingByOwnerId(userId, State_ALL, FROM, SIZE);
+                .getAllBookingByOwnerId(USER_ID, STATE_ALL, FROM, SIZE);
         Mockito.verifyNoMoreInteractions(bookingService);
     }
 }
