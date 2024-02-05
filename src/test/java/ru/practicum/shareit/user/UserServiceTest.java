@@ -58,7 +58,7 @@ public class UserServiceTest {
                 .thenThrow(new ObjectValidationException("User with this email already exists."));
 
         ObjectValidationException exception = assertThrows(ObjectValidationException.class, () ->
-            userService.createUser(galinaDto));
+                userService.createUser(galinaDto));
 
         assertEquals("User with this email already exists.", exception.getMessage());
 

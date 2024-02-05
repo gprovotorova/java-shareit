@@ -97,7 +97,7 @@ public class ItemServiceTest {
 
     private final ItemDtoWithBooking notebookDtoWithBooking =
             ItemMapperWithBooking.toItemDtoWithBooking(new ArrayList<>(), lastBooking, nextBooking, notebook);
-    private final  List<Item> items = List.of(
+    private final List<Item> items = List.of(
             new Item(1L,
                     "Notebook",
                     "Notebook description",

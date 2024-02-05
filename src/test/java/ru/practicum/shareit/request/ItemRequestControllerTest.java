@@ -125,11 +125,11 @@ public class ItemRequestControllerTest {
         Mockito.when(itemRequestService.getRequestById(userId, requestId)).thenReturn(request);
 
         mvc.perform(
-                get("/requests/{requestId}", requestId)
-                        .header("X-Sharer-User-Id", String.valueOf(userId))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
+                        get("/requests/{requestId}", requestId)
+                                .header("X-Sharer-User-Id", String.valueOf(userId))
+                                .characterEncoding(StandardCharsets.UTF_8)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(request)));
 
@@ -189,11 +189,11 @@ public class ItemRequestControllerTest {
         Mockito.when(itemRequestService.getRequestsByOwner(1L)).thenReturn(requests);
 
         mvc.perform(
-                get("/requests")
-                        .header("X-Sharer-User-Id", String.valueOf(1L))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
+                        get("/requests")
+                                .header("X-Sharer-User-Id", String.valueOf(1L))
+                                .characterEncoding(StandardCharsets.UTF_8)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(requests)));
 

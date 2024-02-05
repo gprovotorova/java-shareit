@@ -16,7 +16,7 @@ public class ItemDtoTest {
     @Autowired
     private JacksonTester<ItemDto> json;
     private final ItemDto itemDto = new ItemDto(
-            2L,
+            1L,
             "Notebook",
             "Notebook description",
             true,
@@ -36,5 +36,4 @@ public class ItemDtoTest {
         assertThat(result).extractingJsonPathNumberValue("$.owner").isEqualTo(null);
         assertThat(result).extractingJsonPathNumberValue("$.request").isEqualTo(null);
     }
-
 }

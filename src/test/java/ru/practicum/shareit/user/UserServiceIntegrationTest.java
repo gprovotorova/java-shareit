@@ -34,7 +34,7 @@ public class UserServiceIntegrationTest {
                 "Galina",
                 "galina@mail.ru");
 
-        User anna =  new User(
+        User anna = new User(
                 2L,
                 "Anna",
                 "anna@mail.ru");

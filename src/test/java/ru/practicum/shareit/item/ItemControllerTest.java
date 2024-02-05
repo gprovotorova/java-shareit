@@ -55,12 +55,12 @@ public class ItemControllerTest {
     private static final int SIZE = 10;
     private final static String SEARCH_TEXT = "description";
 
-    private User user = new User(
-            2L,
+    private final User user = new User(
+            1L,
             "Galina",
             "galina@mail.ru");
 
-    private ItemDto itemDto = new ItemDto(
+    private final ItemDto itemDto = new ItemDto(
             1L,
             "Notebook",
             "Notebook description",
@@ -69,7 +69,7 @@ public class ItemControllerTest {
             null
     );
 
-    private ItemDtoWithBooking itemDtoWithBooking = new ItemDtoWithBooking(
+    private final ItemDtoWithBooking itemDtoWithBooking = new ItemDtoWithBooking(
             1L,
             "Notebook",
             "Notebook description",
@@ -79,13 +79,13 @@ public class ItemControllerTest {
             new ArrayList<>()
     );
 
-    private CommentDto comment = new CommentDto(
+    private final CommentDto comment = new CommentDto(
             1L,
             "Comment to notebook",
             user.getName(),
             LocalDateTime.now().minusDays(30));
 
-    private List<ItemDto> items = Arrays.asList(
+    private final List<ItemDto> items = Arrays.asList(
             new ItemDto(
                     1L,
                     "Notebook",
@@ -115,12 +115,12 @@ public class ItemControllerTest {
         Mockito.when(itemService.createItem(itemDto, userId)).thenReturn(itemDto);
 
         mvc.perform(
-                post("/items")
-                        .header("X-Sharer-User-Id", String.valueOf(userId))
-                        .content(objectMapper.writeValueAsString(itemDto))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
+                        post("/items")
+                                .header("X-Sharer-User-Id", String.valueOf(userId))
+                                .content(objectMapper.writeValueAsString(itemDto))
+                                .characterEncoding(StandardCharsets.UTF_8)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(itemDto)));
 
@@ -134,12 +134,12 @@ public class ItemControllerTest {
         Mockito.when(itemService.updateItem(itemDto, userId, itemId)).thenReturn(itemDto);
 
         mvc.perform(
-                patch("/items/{itemId}", itemId)
-                        .header("X-Sharer-User-Id", String.valueOf(userId))
-                        .content(objectMapper.writeValueAsString(itemDto))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
+                        patch("/items/{itemId}", itemId)
+                                .header("X-Sharer-User-Id", String.valueOf(userId))
+                                .content(objectMapper.writeValueAsString(itemDto))
+                                .characterEncoding(StandardCharsets.UTF_8)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(itemDto)));
 
@@ -153,12 +153,12 @@ public class ItemControllerTest {
         Mockito.when(itemService.getItemById(userId, itemId)).thenReturn(itemDtoWithBooking);
 
         mvc.perform(
-                get("/items/{itemId}", itemId)
-                        .header("X-Sharer-User-Id", String.valueOf(userId))
-                        .content(objectMapper.writeValueAsString(itemDtoWithBooking))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
+                        get("/items/{itemId}", itemId)
+                                .header("X-Sharer-User-Id", String.valueOf(userId))
+                                .content(objectMapper.writeValueAsString(itemDtoWithBooking))
+                                .characterEncoding(StandardCharsets.UTF_8)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(itemDtoWithBooking)));
 
@@ -175,13 +175,13 @@ public class ItemControllerTest {
         Mockito.when(itemService.getItemsByUser(userId, from, size)).thenReturn(new ArrayList<>());
 
         mvc.perform(
-                get("/items")
-                        .header("X-Sharer-User-Id", String.valueOf(userId))
-                        .param("from", String.valueOf(from))
-                        .param("size", String.valueOf(size))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
+                        get("/items")
+                                .header("X-Sharer-User-Id", String.valueOf(userId))
+                                .param("from", String.valueOf(from))
+                                .param("size", String.valueOf(size))
+                                .characterEncoding(StandardCharsets.UTF_8)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(new ArrayList<>())));
 
@@ -193,17 +193,17 @@ public class ItemControllerTest {
     @SneakyThrows
     @Test
     void searchItemByQuery_shouldReturnItemsList() {
-        Mockito.when(itemService.searchItemByQuery(userId, SEARCH_TEXT, FROM, SIZE)). thenReturn(items);
+        Mockito.when(itemService.searchItemByQuery(userId, SEARCH_TEXT, FROM, SIZE)).thenReturn(items);
 
         mvc.perform(
-                get("/items/search")
-                        .header("X-Sharer-User-Id", String.valueOf(userId))
-                        .param("text", SEARCH_TEXT)
-                        .param("from", String.valueOf(FROM))
-                        .param("size", String.valueOf(SIZE))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
+                        get("/items/search")
+                                .header("X-Sharer-User-Id", String.valueOf(userId))
+                                .param("text", SEARCH_TEXT)
+                                .param("from", String.valueOf(FROM))
+                                .param("size", String.valueOf(SIZE))
+                                .characterEncoding(StandardCharsets.UTF_8)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(items)));
 
@@ -218,12 +218,12 @@ public class ItemControllerTest {
         Mockito.when(itemService.addComment(userId, itemId, comment)).thenReturn(comment);
 
         mvc.perform(
-                post("/items/{itemId}/comment", itemId)
-                        .header("X-Sharer-User-Id", String.valueOf(userId))
-                        .content(objectMapper.writeValueAsString(comment))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
+                        post("/items/{itemId}/comment", itemId)
+                                .header("X-Sharer-User-Id", String.valueOf(userId))
+                                .content(objectMapper.writeValueAsString(comment))
+                                .characterEncoding(StandardCharsets.UTF_8)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(comment)));
 

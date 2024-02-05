@@ -102,12 +102,12 @@ public class BookingControllerTest {
         Mockito.when(bookingService.createBooking(bookingDto, userId)).thenReturn(bookingDto);
 
         mvc.perform(
-                post("/bookings")
-                        .header("X-Sharer-User-Id", String.valueOf(userId))
-                        .content(objectMapper.writeValueAsString(bookingDto))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
+                        post("/bookings")
+                                .header("X-Sharer-User-Id", String.valueOf(userId))
+                                .content(objectMapper.writeValueAsString(bookingDto))
+                                .characterEncoding(StandardCharsets.UTF_8)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(bookingDto)));
 
@@ -121,12 +121,12 @@ public class BookingControllerTest {
         Mockito.when(bookingService.updateBooking(bookingId, userId, approved)).thenReturn(bookingDto);
 
         mvc.perform(
-                patch("/bookings/{bookingId}", bookingId)
-                        .header("X-Sharer-User-Id", String.valueOf(userId))
-                        .param("approved", String.valueOf(approved))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
+                        patch("/bookings/{bookingId}", bookingId)
+                                .header("X-Sharer-User-Id", String.valueOf(userId))
+                                .param("approved", String.valueOf(approved))
+                                .characterEncoding(StandardCharsets.UTF_8)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(bookingDto)));
 
@@ -137,15 +137,15 @@ public class BookingControllerTest {
 
     @SneakyThrows
     @Test
-    void getBookingById_shouldReturnBookingById(){
+    void getBookingById_shouldReturnBookingById() {
         Mockito.when(bookingService.getBookingById(userId, bookingId)).thenReturn(bookingDto);
 
         mvc.perform(
-                get("/bookings/{bookingId}", bookingId)
-                        .header("X-Sharer-User-Id", String.valueOf(userId))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
+                        get("/bookings/{bookingId}", bookingId)
+                                .header("X-Sharer-User-Id", String.valueOf(userId))
+                                .characterEncoding(StandardCharsets.UTF_8)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(bookingDto)));
 
@@ -155,18 +155,18 @@ public class BookingControllerTest {
 
     @SneakyThrows
     @Test
-    void getAllBookingByUserId_shouldReturnListOfBookingsByUserId(){
+    void getAllBookingByUserId_shouldReturnListOfBookingsByUserId() {
         Mockito.when(bookingService.getAllBookingByUserId(userId, State_ALL, FROM, SIZE)).thenReturn(bookings);
 
         mvc.perform(
-                get("/bookings")
-                        .header("X-Sharer-User-Id", String.valueOf(userId))
-                        .param("state", State_ALL)
-                        .param("from", String.valueOf(FROM))
-                        .param("size", String.valueOf(SIZE))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
+                        get("/bookings")
+                                .header("X-Sharer-User-Id", String.valueOf(userId))
+                                .param("state", State_ALL)
+                                .param("from", String.valueOf(FROM))
+                                .param("size", String.valueOf(SIZE))
+                                .characterEncoding(StandardCharsets.UTF_8)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(bookings)));
 
@@ -177,18 +177,18 @@ public class BookingControllerTest {
 
     @SneakyThrows
     @Test
-    void getAllBookingByOwnerId_shouldReturnListOfBookingsByOwnerId(){
+    void getAllBookingByOwnerId_shouldReturnListOfBookingsByOwnerId() {
         Mockito.when(bookingService.getAllBookingByOwnerId(userId, State_ALL, FROM, SIZE)).thenReturn(bookings);
 
         mvc.perform(
-                get("/bookings/owner")
-                        .header("X-Sharer-User-Id", String.valueOf(userId))
-                        .param("state", State_ALL)
-                        .param("from", String.valueOf(FROM))
-                        .param("size", String.valueOf(SIZE))
-                        .characterEncoding(StandardCharsets.UTF_8)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
+                        get("/bookings/owner")
+                                .header("X-Sharer-User-Id", String.valueOf(userId))
+                                .param("state", State_ALL)
+                                .param("from", String.valueOf(FROM))
+                                .param("size", String.valueOf(SIZE))
+                                .characterEncoding(StandardCharsets.UTF_8)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(bookings)));
 
