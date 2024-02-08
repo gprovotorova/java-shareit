@@ -1,15 +1,12 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.enums.BookingStatus;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
-import ru.practicum.shareit.exception.InvalidPathVariableException;
 import ru.practicum.shareit.exception.ObjectNotFoundException;
 import ru.practicum.shareit.exception.ObjectValidationException;
 import ru.practicum.shareit.item.dto.ItemDtoWithBooking;
@@ -105,18 +102,13 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemDtoWithBooking> getItemsByUser(Long userId, Integer from, Integer size) {
+    public List<ItemDtoWithBooking> getItemsByUser(Long userId, Pageable page) {
         LocalDateTime dateTime = LocalDateTime.now();
-        userRepository.findById(userId)
-                .orElseThrow(() -> new ObjectNotFoundException("User with id=" + userId + " not found."));
+        userRepository.existsById(userId);
         Stream<Item> items;
-        if (from == null || size == null) {
+        if (page.isUnpaged()) {
             items = itemRepository.findByOwnerIdOrderByIdAsc(userId).stream();
-        } else if (from < 0 || size <= 0) {
-            throw new InvalidPathVariableException("Incorrect page parameters");
         } else {
-            int pageNumber = from / size;
-            final Pageable page = PageRequest.of(pageNumber, size, Sort.by(Sort.Direction.ASC, "id"));
             items = itemRepository.findByOwnerIdOrderByIdAsc(userId, page).get();
         }
         return items.map(item -> {
@@ -132,22 +124,17 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemDto> searchItemByQuery(Long userId, String text, Integer from, Integer size) {
+    public List<ItemDto> searchItemByQuery(Long userId, String text, Pageable page) {
         if (text.isEmpty() || text.isBlank()) {
             return new ArrayList<>();
         }
-        userRepository.findById(userId)
-                .orElseThrow(() -> new ObjectNotFoundException("User with id=" + userId + " not found."));
-        if (from == null || size == null) {
+        userRepository.existsById(userId);
+        if (page.isUnpaged()) {
             return itemRepository.searchByQuery(text)
                     .stream()
                     .map(ItemMapper::toItemDto)
                     .collect(Collectors.toList());
-        } else if (from < 0 || size <= 0) {
-            throw new InvalidPathVariableException("Incorrect page parameters");
         } else {
-            int pageNumber = from / size;
-            final Pageable page = PageRequest.of(pageNumber, size, Sort.by(Sort.Direction.ASC, "id"));
             return itemRepository.searchByQuery(text, page)
                     .stream()
                     .map(ItemMapper::toItemDto)

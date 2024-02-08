@@ -8,10 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.comments.dto.CommentDto;
+import ru.practicum.shareit.common.PageMaker;
 import ru.practicum.shareit.item.controller.ItemController;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoWithBooking;
@@ -172,7 +174,9 @@ public class ItemControllerTest {
         int from = 3;
         int size = 1;
 
-        Mockito.when(itemService.getItemsByUser(userId, from, size)).thenReturn(new ArrayList<>());
+        Pageable page = PageMaker.makePageableWithSort(from, size);
+
+        Mockito.when(itemService.getItemsByUser(userId, page)).thenReturn(new ArrayList<>());
 
         mvc.perform(
                         get("/items")
@@ -185,7 +189,7 @@ public class ItemControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(new ArrayList<>())));
 
-        Mockito.verify(itemService, Mockito.times(1)).getItemsByUser(userId, from, size);
+        Mockito.verify(itemService, Mockito.times(1)).getItemsByUser(userId, page);
         Mockito.verifyNoMoreInteractions(itemService);
     }
 
@@ -193,7 +197,9 @@ public class ItemControllerTest {
     @SneakyThrows
     @Test
     void searchItemByQuery_shouldReturnItemsList() {
-        Mockito.when(itemService.searchItemByQuery(userId, SEARCH_TEXT, FROM, SIZE)).thenReturn(items);
+        Pageable page = PageMaker.makePageableWithSort(FROM, SIZE);
+
+        Mockito.when(itemService.searchItemByQuery(userId, SEARCH_TEXT, page)).thenReturn(items);
 
         mvc.perform(
                         get("/items/search")
@@ -208,7 +214,7 @@ public class ItemControllerTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(items)));
 
         Mockito.verify(itemService, Mockito.times(1))
-                .searchItemByQuery(userId, SEARCH_TEXT, FROM, SIZE);
+                .searchItemByQuery(userId, SEARCH_TEXT, page);
         Mockito.verifyNoMoreInteractions(itemService);
     }
 

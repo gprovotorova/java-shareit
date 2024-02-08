@@ -17,6 +17,7 @@ import ru.practicum.shareit.booking.service.BookingServiceImpl;
 import ru.practicum.shareit.comments.dto.CommentDto;
 import ru.practicum.shareit.comments.model.Comment;
 import ru.practicum.shareit.comments.repository.CommentRepository;
+import ru.practicum.shareit.common.PageMaker;
 import ru.practicum.shareit.exception.InvalidPathVariableException;
 import ru.practicum.shareit.exception.ObjectNotFoundException;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -362,14 +363,16 @@ public class ItemServiceTest {
 
         PageImpl pageRequests = new PageImpl(items);
 
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(galina));
+        when(userRepository.existsById(any(Long.class))).thenReturn(true);
         when(itemRepository.findByOwnerIdOrderByIdAsc(any(Long.class), any(Pageable.class))).thenReturn(pageRequests);
 
-        List<ItemDtoWithBooking> savedItemDtoWithBooking = itemService.getItemsByUser(galina.getId(), FROM, SIZE);
+        Pageable page = PageMaker.makePageableWithSort(FROM, SIZE);
+
+        List<ItemDtoWithBooking> savedItemDtoWithBooking = itemService.getItemsByUser(galina.getId(), page);
 
         assertEquals(itemDtoWithBooking.size(), savedItemDtoWithBooking.size());
 
-        verify(userRepository, times(1)).findById(galina.getId());
+        verify(userRepository, times(1)).existsById(galina.getId());
     }
 
     @Transactional
@@ -396,23 +399,27 @@ public class ItemServiceTest {
                         nextBookingSecondItem,
                         items.get(1)));
 
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(galina));
+        when(userRepository.existsById(any(Long.class))).thenReturn(true);
         when(itemRepository.findByOwnerIdOrderByIdAsc(any(Long.class))).thenReturn(items);
 
-        List<ItemDtoWithBooking> savedItemDtoWithBooking = itemService.getItemsByUser(galina.getId(), FROM, null);
+        Pageable page = PageMaker.makePageableWithSort(FROM, null);
+
+        List<ItemDtoWithBooking> savedItemDtoWithBooking = itemService.getItemsByUser(galina.getId(), page);
 
         assertEquals(itemDtoWithBooking.size(), savedItemDtoWithBooking.size());
 
-        verify(userRepository, times(1)).findById(galina.getId());
+        verify(userRepository, times(1)).existsById(galina.getId());
     }
 
     @Transactional
     @Test
     void searchItemByQuery_shouldReturnItemIfLimitIsNull() {
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(galina));
+        when(userRepository.existsById(any(Long.class))).thenReturn(true);
         when(itemRepository.searchByQuery(eq(SEARCH_TEXT))).thenReturn(List.of(notebook));
 
-        List<ItemDto> savedItems = itemService.searchItemByQuery(galina.getId(), SEARCH_TEXT, FROM, null);
+        Pageable page = PageMaker.makePageableWithSort(FROM, null);
+
+        List<ItemDto> savedItems = itemService.searchItemByQuery(galina.getId(), SEARCH_TEXT, page);
 
         assertFalse(savedItems.isEmpty());
         assertEquals(notebookDto, savedItems.get(0));
@@ -440,12 +447,14 @@ public class ItemServiceTest {
                         null)
         );
 
-        Page<Item> page = new PageImpl<>(items);
+        Page<Item> pages = new PageImpl<>(items);
 
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(galina));
-        when(itemRepository.searchByQuery(eq(SEARCH_TEXT), any(Pageable.class))).thenReturn(page);
+        when(userRepository.existsById(any(Long.class))).thenReturn(true);
+        when(itemRepository.searchByQuery(eq(SEARCH_TEXT), any(Pageable.class))).thenReturn(pages);
 
-        List<ItemDto> savedItems = itemService.searchItemByQuery(galina.getId(), SEARCH_TEXT, FROM, SIZE);
+        Pageable page = PageMaker.makePageableWithSort(FROM, SIZE);
+
+        List<ItemDto> savedItems = itemService.searchItemByQuery(galina.getId(), SEARCH_TEXT, page);
 
         assertFalse(savedItems.isEmpty(), "The list must not be empty.");
         assertEquals(listDto.size(), savedItems.size(), "The list sizes must match.");
@@ -468,19 +477,21 @@ public class ItemServiceTest {
     @Transactional
     @Test
     void searchItemByQuery_shouldThrowExceptionIfFromLessThanZero() {
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(galina));
+        //when(userRepository.existsById(any(Long.class))).thenReturn(true);
+
+        //Pageable page = PageMaker.makePageableWithSort(-1, SIZE);
 
         assertThrows(InvalidPathVariableException.class,
-                () -> itemService.searchItemByQuery(galina.getId(), SEARCH_TEXT, -1, SIZE));
+                () -> PageMaker.makePageableWithSort(-1, SIZE));
     }
 
     @Transactional
     @Test
     void searchItemByQuery_shouldThrowExceptionIfSizeIsZero() {
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(galina));
+        //when(userRepository.existsById(any(Long.class))).thenReturn(true);
 
         assertThrows(InvalidPathVariableException.class,
-                () -> itemService.searchItemByQuery(galina.getId(), SEARCH_TEXT, FROM, 0));
+                () -> PageMaker.makePageableWithSort(FROM, 0));
     }
 
     @Transactional

@@ -4,11 +4,13 @@ import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.enums.BookingStatus;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
+import ru.practicum.shareit.common.PageMaker;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemDtoWithBooking;
 import ru.practicum.shareit.item.mapper.ItemMapper;
@@ -104,7 +106,10 @@ public class ItemServiceIntegrationTest {
         itemService.createItem(itemDto, galina.getId());
         booking = bookingRepository.save(booking);
         nextBooking = bookingRepository.save(nextBooking);
-        List<ItemDtoWithBooking> list = itemService.getItemsByUser(galina.getId(), FROM, SIZE);
+
+        Pageable page = PageMaker.makePageableWithSort(FROM, SIZE);
+
+        List<ItemDtoWithBooking> list = itemService.getItemsByUser(galina.getId(), page);
 
         assertNotNull(list, "The list must not be null.");
         assertEquals(2, list.size(), "List size must be 2.");

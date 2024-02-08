@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.controller;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.GetMapping;
 import ru.practicum.shareit.common.Create;
+import ru.practicum.shareit.common.PageMaker;
 import ru.practicum.shareit.item.dto.ItemDtoWithBooking;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.service.ItemService;
@@ -54,7 +56,8 @@ public class ItemController {
                                                    @RequestParam(required = false) Integer from,
                                                    @RequestParam(required = false) Integer size) {
         log.info("Get all items user={}", userId);
-        return itemService.getItemsByUser(userId, from, size);
+        Pageable page = PageMaker.makePageableWithSort(from, size);
+        return itemService.getItemsByUser(userId, page);
     }
 
     @GetMapping("/search")
@@ -63,7 +66,8 @@ public class ItemController {
                                            @RequestParam(required = false) Integer from,
                                            @RequestParam(required = false) Integer size) {
         log.info("Search item text={}", text);
-        return itemService.searchItemByQuery(userId, text, from, size);
+        Pageable page = PageMaker.makePageableWithSort(from, size);
+        return itemService.searchItemByQuery(userId, text, page);
     }
 
     @PostMapping("/{itemId}/comment")

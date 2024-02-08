@@ -8,12 +8,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.booking.controller.BookingController;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.enums.BookingStatus;
 import ru.practicum.shareit.booking.service.BookingService;
+import ru.practicum.shareit.common.PageMaker;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.user.model.User;
 
@@ -156,7 +158,9 @@ public class BookingControllerTest {
     @SneakyThrows
     @Test
     void getAllBookingByUserId_shouldReturnListOfBookingsByUserId() {
-        Mockito.when(bookingService.getAllBookingByUserId(USER_ID, STATE_ALL, FROM, SIZE)).thenReturn(bookings);
+        Pageable page = PageMaker.makePageableWithSort(FROM, SIZE);
+
+        Mockito.when(bookingService.getAllBookingByUserId(USER_ID, STATE_ALL, page)).thenReturn(bookings);
 
         mvc.perform(
                         get("/bookings")
@@ -171,14 +175,16 @@ public class BookingControllerTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(bookings)));
 
         Mockito.verify(bookingService, Mockito.times(1))
-                .getAllBookingByUserId(USER_ID, STATE_ALL, FROM, SIZE);
+                .getAllBookingByUserId(USER_ID, STATE_ALL, page);
         Mockito.verifyNoMoreInteractions(bookingService);
     }
 
     @SneakyThrows
     @Test
     void getAllBookingByOwnerId_shouldReturnListOfBookingsByOwnerId() {
-        Mockito.when(bookingService.getAllBookingByOwnerId(USER_ID, STATE_ALL, FROM, SIZE)).thenReturn(bookings);
+        Pageable page = PageMaker.makePageableWithSort(FROM, SIZE);
+
+        Mockito.when(bookingService.getAllBookingByOwnerId(USER_ID, STATE_ALL, page)).thenReturn(bookings);
 
         mvc.perform(
                         get("/bookings/owner")
@@ -193,7 +199,7 @@ public class BookingControllerTest {
                 .andExpect(content().json(objectMapper.writeValueAsString(bookings)));
 
         Mockito.verify(bookingService, Mockito.times(1))
-                .getAllBookingByOwnerId(USER_ID, STATE_ALL, FROM, SIZE);
+                .getAllBookingByOwnerId(USER_ID, STATE_ALL, page);
         Mockito.verifyNoMoreInteractions(bookingService);
     }
 }

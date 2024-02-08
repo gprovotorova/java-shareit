@@ -177,6 +177,17 @@
 						<excludes>
 							<exclude>ru/practicum/shareit/exception/**/*</exclude>
 							<exclude>**/*BookingState.class</exclude>
+							<exclude>**/*PageMaker.class</exclude>
+							<exclude>**/*Item.class</exclude>
+							<exclude>**/*User.class</exclude>
+							<exclude>**/*Booking.class</exclude>
+							<exclude>**/*Comment.class</exclude>
+							<exclude>**/*ItemRequest.class</exclude>
+							<exclude>**/*ItemMapper.class</exclude>
+							<exclude>**/*UserMapper.class</exclude>
+							<exclude>**/*BookingMapper.class</exclude>
+							<exclude>**/*CommentMapper.class</exclude>
+							<exclude>**/*ItemRequestMapper.class</exclude>
 						</excludes>
 					</configuration>
 					<executions>

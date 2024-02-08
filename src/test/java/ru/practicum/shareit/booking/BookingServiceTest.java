@@ -14,6 +14,7 @@ import ru.practicum.shareit.booking.enums.BookingStatus;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.booking.service.BookingServiceImpl;
+import ru.practicum.shareit.common.PageMaker;
 import ru.practicum.shareit.exception.ObjectNotFoundException;
 import ru.practicum.shareit.exception.ObjectValidationException;
 import ru.practicum.shareit.exception.StatusBookingException;
@@ -281,186 +282,210 @@ public class BookingServiceTest {
     @Transactional
     @Test
     void getAllBookingByOwnerId_shouldThrowExceptionIfUseridIsIncorrect() {
+        Pageable page = PageMaker.makePageableWithSort(FROM, SIZE);
+
         assertThrows(ObjectNotFoundException.class,
-                () -> bookingService.getAllBookingByOwnerId(999L, STATE_ALL, FROM, SIZE));
+                () -> bookingService.getAllBookingByOwnerId(999L, STATE_ALL, page));
     }
 
     @Transactional
     @Test
     void getAllBookingByOwnerId_shouldReturnBookingIfSizeIsNullAndStateIsAll() {
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(galina));
+        when(userRepository.existsById(any(Long.class))).thenReturn(true);
         when(bookingRepository.getAllByItemOwnerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
         when(bookingRepository.getAllBookingsForOwnersItems(any(Long.class))).thenReturn(List.of(booking));
 
-        List<BookingDto> bookings = bookingService.getAllBookingByOwnerId(galina.getId(), STATE_ALL, FROM, null);
+        Pageable page = PageMaker.makePageableWithSort(FROM, null);
+
+        List<BookingDto> bookings = bookingService.getAllBookingByOwnerId(galina.getId(), STATE_ALL, page);
 
         assertNotNull(bookings, "List of bookings should not be null");
         assertFalse(bookings.isEmpty(), "List of bookings should not be empty");
 
-        verify(userRepository, times(1)).findById(galina.getId());
+        verify(userRepository, times(1)).existsById(galina.getId());
     }
 
     @Transactional
     @Test
     void getAllBookingByOwnerId_shouldReturnBookingIfSizeIsNullAndStateIsCurrent() {
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(galina));
+        when(userRepository.existsById(any(Long.class))).thenReturn(true);
         when(bookingRepository.getAllByItemOwnerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
 
+        Pageable page = PageMaker.makePageableWithSort(FROM, null);
+
         List<BookingDto> bookings =
-                bookingService.getAllBookingByOwnerId(galina.getId(), STATE_CURRENT, FROM, null);
+                bookingService.getAllBookingByOwnerId(galina.getId(), STATE_CURRENT, page);
 
         assertNotNull(bookings, "List of bookings should not be null");
         assertTrue(bookings.isEmpty(), "List of bookings should be empty");
 
-        verify(userRepository, times(1)).findById(galina.getId());
+        verify(userRepository, times(1)).existsById(galina.getId());
     }
 
     @Transactional
     @Test
     void getAllBookingByOwnerId_shouldReturnBookingIfSizeIsNullAndStateIsPast() {
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(galina));
+        when(userRepository.existsById(any(Long.class))).thenReturn(true);
         when(bookingRepository.getAllByItemOwnerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
 
+        Pageable page = PageMaker.makePageableWithSort(FROM, null);
+
         List<BookingDto> bookings =
-                bookingService.getAllBookingByOwnerId(galina.getId(), STATE_PAST, FROM, null);
+                bookingService.getAllBookingByOwnerId(galina.getId(), STATE_PAST, page);
 
         assertNotNull(bookings, "List of bookings should not be null");
         assertTrue(bookings.isEmpty(), "List of bookings should be empty");
 
-        verify(userRepository, times(1)).findById(galina.getId());
+        verify(userRepository, times(1)).existsById(galina.getId());
     }
 
     @Transactional
     @Test
     void getAllBookingByOwnerId_shouldReturnBookingIfSizeIsNullAndStateIsFuture() {
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(galina));
+        when(userRepository.existsById(any(Long.class))).thenReturn(true);
         when(bookingRepository.getAllByItemOwnerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
 
+        Pageable page = PageMaker.makePageableWithSort(FROM, null);
+
         List<BookingDto> bookings =
-                bookingService.getAllBookingByOwnerId(galina.getId(), STATE_FUTURE, FROM, null);
+                bookingService.getAllBookingByOwnerId(galina.getId(), STATE_FUTURE, page);
 
         assertNotNull(bookings, "List of bookings should not be null");
         assertTrue(bookings.isEmpty(), "List of bookings should be empty");
 
-        verify(userRepository, times(1)).findById(galina.getId());
+        verify(userRepository, times(1)).existsById(galina.getId());
     }
 
     @Transactional
     @Test
     void getAllBookingByOwnerId_shouldReturnBookingIfSizeIsNullAndStateIsWaiting() {
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(galina));
+        when(userRepository.existsById(any(Long.class))).thenReturn(true);
         when(bookingRepository.getAllByItemOwnerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
 
+        Pageable page = PageMaker.makePageableWithSort(FROM, null);
+
         List<BookingDto> bookings =
-                bookingService.getAllBookingByOwnerId(galina.getId(), STATE_WAITING, FROM, null);
+                bookingService.getAllBookingByOwnerId(galina.getId(), STATE_WAITING, page);
 
         assertNotNull(bookings, "List of bookings should not be null");
         assertTrue(bookings.isEmpty(), "List of bookings should be empty");
 
-        verify(userRepository, times(1)).findById(galina.getId());
+        verify(userRepository, times(1)).existsById(galina.getId());
     }
 
     @Transactional
     @Test
     void getAllBookingByOwnerId_shouldReturnBookingIfSizeIsNullAndStateIsRejected() {
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(galina));
+        when(userRepository.existsById(any(Long.class))).thenReturn(true);
         when(bookingRepository.getAllByItemOwnerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
 
+        Pageable page = PageMaker.makePageableWithSort(FROM, null);
+
         List<BookingDto> bookings =
-                bookingService.getAllBookingByOwnerId(galina.getId(), STATE_REJECTED, FROM, null);
+                bookingService.getAllBookingByOwnerId(galina.getId(), STATE_REJECTED, page);
 
         assertNotNull(bookings, "List of bookings should not be null");
         assertTrue(bookings.isEmpty(), "List of bookings should be empty");
 
-        verify(userRepository, times(1)).findById(galina.getId());
+        verify(userRepository, times(1)).existsById(galina.getId());
     }
 
     @Transactional
     @Test
     void getAllBookingByOwnerId_shouldReturnBookingIfSizeIsNullAndUnknownState() {
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(galina));
+        when(userRepository.existsById(any(Long.class))).thenReturn(true);
         when(bookingRepository.getAllByItemOwnerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
 
-        assertThrows(StatusBookingException.class,
-                () -> bookingService.getAllBookingByOwnerId(galina.getId(), UNKNOWN_STATE, FROM, null));
+        Pageable page = PageMaker.makePageableWithSort(FROM, null);
 
-        verify(userRepository, times(1)).findById(galina.getId());
+        assertThrows(StatusBookingException.class,
+                () -> bookingService.getAllBookingByOwnerId(galina.getId(), UNKNOWN_STATE, page));
+
+        verify(userRepository, times(1)).existsById(galina.getId());
     }
 
 
     @Transactional
     @Test
     void getBookingsByOwnerId_shouldReturnBookingsIfBookingStateIsAll() {
-        Page<Booking> page = new PageImpl<>(List.of(booking));
+        Page<Booking> pages = new PageImpl<>(List.of(booking));
 
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(galina));
+        when(userRepository.existsById(any(Long.class))).thenReturn(true);
         when(bookingRepository.getAllByItemOwnerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
-        when(bookingRepository.getAllBookingsForOwnersItems(any(Long.class), any(Pageable.class))).thenReturn(page);
+        when(bookingRepository.getAllBookingsForOwnersItems(any(Long.class), any(Pageable.class))).thenReturn(pages);
 
-        List<BookingDto> bookings = bookingService.getAllBookingByOwnerId(galina.getId(), STATE_ALL, FROM, SIZE);
+        Pageable page = PageMaker.makePageableWithSort(FROM, SIZE);
+
+        List<BookingDto> bookings = bookingService.getAllBookingByOwnerId(galina.getId(), STATE_ALL, page);
 
         assertNotNull(bookings, "List of bookings should not be null");
         assertFalse(bookings.isEmpty(), "List of bookings should not be empty");
         assertEquals(1, bookings.size());
 
-        verify(userRepository, times(1)).findById(galina.getId());
+        verify(userRepository, times(1)).existsById(galina.getId());
     }
 
     @Transactional
     @Test
     void getBookingsByOwnerId_shouldReturnBookingsIfStateIsCurrent() {
-        Page<Booking> page = new PageImpl<>(List.of(booking));
+        Page<Booking> pages = new PageImpl<>(List.of(booking));
 
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(galina));
+        when(userRepository.existsById(any(Long.class))).thenReturn(true);
         when(bookingRepository.getAllByItemOwnerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
         when(bookingRepository.getCurrentBookingsForOwnersItems(any(Long.class), any(LocalDateTime.class),
-                any(LocalDateTime.class), any(Pageable.class))).thenReturn(page);
+                any(LocalDateTime.class), any(Pageable.class))).thenReturn(pages);
 
-        List<BookingDto> bookings = bookingService.getAllBookingByOwnerId(galina.getId(), STATE_CURRENT, FROM, SIZE);
+        Pageable page = PageMaker.makePageableWithSort(FROM, SIZE);
+
+        List<BookingDto> bookings = bookingService.getAllBookingByOwnerId(galina.getId(), STATE_CURRENT, page);
 
         assertNotNull(bookings, "List of bookings should not be null");
         assertFalse(bookings.isEmpty(), "List of bookings should not be empty");
         assertEquals(1, bookings.size());
 
-        verify(userRepository, times(1)).findById(galina.getId());
+        verify(userRepository, times(1)).existsById(galina.getId());
     }
 
     @Transactional
     @Test
     void getBookingsByOwnerId_shouldReturnBookingsIfBookingStateIsPast() {
-        Page<Booking> page = new PageImpl<>(List.of(booking));
+        Page<Booking> pages = new PageImpl<>(List.of(booking));
 
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(galina));
+        when(userRepository.existsById(any(Long.class))).thenReturn(true);
         when(bookingRepository.getAllByItemOwnerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
         when(bookingRepository.getPastBookingsForOwnersItems(any(Long.class), any(LocalDateTime.class),
-                any(Pageable.class))).thenReturn(page);
+                any(Pageable.class))).thenReturn(pages);
 
-        List<BookingDto> bookings = bookingService.getAllBookingByOwnerId(galina.getId(), STATE_PAST, FROM, SIZE);
+        Pageable page = PageMaker.makePageableWithSort(FROM, SIZE);
+
+        List<BookingDto> bookings = bookingService.getAllBookingByOwnerId(galina.getId(), STATE_PAST, page);
 
         assertNotNull(bookings, "List of bookings should not be null");
         assertFalse(bookings.isEmpty(), "List of bookings should not be empty");
         assertEquals(1, bookings.size());
 
-        verify(userRepository, times(1)).findById(galina.getId());
+        verify(userRepository, times(1)).existsById(galina.getId());
     }
 
     @Transactional
     @Test
     void getBookingsByOwnerId_shouldReturnBookingsIfBookingStateIsFuture() {
-        Page<Booking> page = new PageImpl<>(List.of(booking));
+        Page<Booking> pages = new PageImpl<>(List.of(booking));
 
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(galina));
+        when(userRepository.existsById(any(Long.class))).thenReturn(true);
         when(bookingRepository.getAllByItemOwnerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
         when(bookingRepository.getFutureBookingsForOwnersItems(any(Long.class), any(LocalDateTime.class),
-                any(Pageable.class))).thenReturn(page);
+                any(Pageable.class))).thenReturn(pages);
 
-        List<BookingDto> bookings = bookingService.getAllBookingByOwnerId(galina.getId(), STATE_FUTURE, FROM, SIZE);
+        Pageable page = PageMaker.makePageableWithSort(FROM, SIZE);
+
+        List<BookingDto> bookings = bookingService.getAllBookingByOwnerId(galina.getId(), STATE_FUTURE, page);
 
         assertNotNull(bookings, "List of bookings should not be null");
         assertFalse(bookings.isEmpty(), "List of bookings should not be empty");
         assertEquals(1, bookings.size());
 
-        verify(userRepository, times(1)).findById(galina.getId());
+        verify(userRepository, times(1)).existsById(galina.getId());
     }
 
     @Transactional
@@ -468,20 +493,22 @@ public class BookingServiceTest {
     void getBookingsByOwnerId_shouldReturnBookingsIfBookingStateIsWaiting() {
         booking.setStatus(BookingStatus.WAITING);
 
-        Page<Booking> page = new PageImpl<>(List.of(booking));
+        Page<Booking> pages = new PageImpl<>(List.of(booking));
 
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(galina));
+        when(userRepository.existsById(any(Long.class))).thenReturn(true);
         when(bookingRepository.getAllByItemOwnerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
         when(bookingRepository.getBookingsForOwnersWithStatusContaining(any(Long.class), any(BookingStatus.class),
-                any(Pageable.class))).thenReturn(page);
+                any(Pageable.class))).thenReturn(pages);
 
-        List<BookingDto> bookings = bookingService.getAllBookingByOwnerId(galina.getId(), STATE_WAITING, FROM, SIZE);
+        Pageable page = PageMaker.makePageableWithSort(FROM, SIZE);
+
+        List<BookingDto> bookings = bookingService.getAllBookingByOwnerId(galina.getId(), STATE_WAITING, page);
 
         assertNotNull(bookings, "List of bookings should not be null");
         assertFalse(bookings.isEmpty(), "List of bookings should not be empty");
         assertEquals(1, bookings.size());
 
-        verify(userRepository, times(1)).findById(galina.getId());
+        verify(userRepository, times(1)).existsById(galina.getId());
     }
 
     @Transactional
@@ -489,213 +516,241 @@ public class BookingServiceTest {
     void getBookingsByOwnerId_shouldReturnBookingsIfBookingStateIsRejected() {
         booking.setStatus(BookingStatus.REJECTED);
 
-        Page<Booking> page = new PageImpl<>(List.of(booking));
+        Page<Booking> pages = new PageImpl<>(List.of(booking));
 
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(galina));
+        when(userRepository.existsById(any(Long.class))).thenReturn(true);
         when(bookingRepository.getAllByItemOwnerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
         when(bookingRepository.getBookingsForOwnersWithStatusContaining(any(Long.class), any(BookingStatus.class),
-                any(Pageable.class))).thenReturn(page);
+                any(Pageable.class))).thenReturn(pages);
 
-        List<BookingDto> bookings = bookingService.getAllBookingByOwnerId(galina.getId(), STATE_REJECTED, FROM, SIZE);
+        Pageable page = PageMaker.makePageableWithSort(FROM, SIZE);
+
+        List<BookingDto> bookings = bookingService.getAllBookingByOwnerId(galina.getId(), STATE_REJECTED, page);
 
         assertNotNull(bookings, "List of bookings should not be null");
         assertFalse(bookings.isEmpty(), "List of bookings should not be empty");
         assertEquals(1, bookings.size());
 
-        verify(userRepository, times(1)).findById(galina.getId());
+        verify(userRepository, times(1)).existsById(galina.getId());
     }
 
     @Transactional
     @Test
     void getAllBookingByOwnerId_shouldThrowExceptionBookingStateIsUnknownState() {
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(galina));
+        when(userRepository.existsById(any(Long.class))).thenReturn(true);
         when(bookingRepository.getAllByItemOwnerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
 
-        assertThrows(StatusBookingException.class,
-                () -> bookingService.getAllBookingByOwnerId(galina.getId(), UNKNOWN_STATE, FROM, SIZE));
+        Pageable page = PageMaker.makePageableWithSort(FROM, SIZE);
 
-        verify(userRepository, times(1)).findById(galina.getId());
+        assertThrows(StatusBookingException.class,
+                () -> bookingService.getAllBookingByOwnerId(galina.getId(), UNKNOWN_STATE, page));
+
+        verify(userRepository, times(1)).existsById(galina.getId());
     }
 
     @Transactional
     @Test
     void getAllBookingByUserId_shouldThrowExceptionIfUseridIsIncorrect() {
+        Pageable page = PageMaker.makePageableWithSort(FROM, SIZE);
+
         assertThrows(ObjectNotFoundException.class,
-                () -> bookingService.getAllBookingByUserId(999L, STATE_ALL, FROM, SIZE));
+                () -> bookingService.getAllBookingByUserId(999L, STATE_ALL, page));
     }
 
     @Transactional
     @Test
     void getAllBookingByUserId_shouldReturnBookingIfSizeIsNullAndStateIsAll() {
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(anna));
+        when(userRepository.existsById(any(Long.class))).thenReturn(true);
         when(bookingRepository.getAllByBookerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
         when(bookingRepository.findByBookerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
 
-        List<BookingDto> bookings = bookingService.getAllBookingByUserId(anna.getId(), STATE_ALL, FROM, null);
+        Pageable page = PageMaker.makePageableWithSort(FROM, null);
+
+        List<BookingDto> bookings = bookingService.getAllBookingByUserId(anna.getId(), STATE_ALL, page);
 
         assertNotNull(bookings, "List of bookings should not be null");
         assertFalse(bookings.isEmpty(), "List of bookings should not be empty");
         assertEquals(1, bookings.size());
 
-        verify(userRepository, times(1)).findById(anna.getId());
+        verify(userRepository, times(1)).existsById(anna.getId());
     }
 
     @Transactional
     @Test
     void getAllBookingByUserId_shouldReturnBookingIfSizeIsNullAndStateIsCurrent() {
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(anna));
+        when(userRepository.existsById(any(Long.class))).thenReturn(true);
         when(bookingRepository.getAllByBookerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
 
-        List<BookingDto> bookings = bookingService.getAllBookingByUserId(anna.getId(), STATE_CURRENT, FROM, null);
+        Pageable page = PageMaker.makePageableWithSort(FROM, null);
+
+        List<BookingDto> bookings = bookingService.getAllBookingByUserId(anna.getId(), STATE_CURRENT, page);
 
         assertNotNull(bookings, "List of bookings should not be null");
         assertTrue(bookings.isEmpty(), "List of bookings should be empty");
 
-        verify(userRepository, times(1)).findById(anna.getId());
+        verify(userRepository, times(1)).existsById(anna.getId());
     }
 
     @Transactional
     @Test
     void getAllBookingByUserId_shouldReturnBookingIfSizeIsNullAndStateIsPast() {
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(anna));
+        when(userRepository.existsById(any(Long.class))).thenReturn(true);
         when(bookingRepository.getAllByBookerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
 
-        List<BookingDto> bookings = bookingService.getAllBookingByUserId(anna.getId(), STATE_PAST, FROM, null);
+        Pageable page = PageMaker.makePageableWithSort(FROM, null);
+
+        List<BookingDto> bookings = bookingService.getAllBookingByUserId(anna.getId(), STATE_PAST, page);
 
         assertNotNull(bookings, "List of bookings should not be null");
         assertTrue(bookings.isEmpty(), "List of bookings should be empty");
 
-        verify(userRepository, times(1)).findById(anna.getId());
+        verify(userRepository, times(1)).existsById(anna.getId());
     }
 
     @Transactional
     @Test
     void getAllBookingByUserId_shouldReturnBookingIfSizeIsNullAndStateIsFuture() {
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(anna));
+        when(userRepository.existsById(any(Long.class))).thenReturn(true);
         when(bookingRepository.getAllByBookerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
 
-        List<BookingDto> bookings = bookingService.getAllBookingByUserId(anna.getId(), STATE_FUTURE, FROM, null);
+        Pageable page = PageMaker.makePageableWithSort(FROM, null);
+
+        List<BookingDto> bookings = bookingService.getAllBookingByUserId(anna.getId(), STATE_FUTURE, page);
 
         assertNotNull(bookings, "List of bookings should not be null");
         assertTrue(bookings.isEmpty(), "List of bookings should be empty");
 
-        verify(userRepository, times(1)).findById(anna.getId());
+        verify(userRepository, times(1)).existsById(anna.getId());
     }
 
     @Transactional
     @Test
     void getAllBookingByUserId_shouldReturnBookingIfSizeIsNullAndStateIsWaiting() {
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(anna));
+        when(userRepository.existsById(any(Long.class))).thenReturn(true);
         when(bookingRepository.getAllByBookerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
 
-        List<BookingDto> bookings = bookingService.getAllBookingByUserId(anna.getId(), STATE_WAITING, FROM, null);
+        Pageable page = PageMaker.makePageableWithSort(FROM, null);
+
+        List<BookingDto> bookings = bookingService.getAllBookingByUserId(anna.getId(), STATE_WAITING, page);
 
         assertNotNull(bookings, "List of bookings should not be null");
         assertTrue(bookings.isEmpty(), "List of bookings should be empty");
 
-        verify(userRepository, times(1)).findById(anna.getId());
+        verify(userRepository, times(1)).existsById(anna.getId());
     }
 
     @Transactional
     @Test
     void getAllBookingByUserId_shouldReturnBookingIfSizeIsNullAndStateIsRejected() {
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(anna));
+        when(userRepository.existsById(any(Long.class))).thenReturn(true);
         when(bookingRepository.getAllByBookerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
 
-        List<BookingDto> bookings = bookingService.getAllBookingByUserId(anna.getId(), STATE_REJECTED, FROM, null);
+        Pageable page = PageMaker.makePageableWithSort(FROM, null);
+
+        List<BookingDto> bookings = bookingService.getAllBookingByUserId(anna.getId(), STATE_REJECTED, page);
 
         assertNotNull(bookings, "List of bookings should not be null");
         assertTrue(bookings.isEmpty(), "List of bookings should be empty");
 
-        verify(userRepository, times(1)).findById(anna.getId());
+        verify(userRepository, times(1)).existsById(anna.getId());
     }
 
     @Transactional
     @Test
     void getAllBookingByUserId_shouldReturnBookingIfSizeIsNullAndUnknownState() {
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(anna));
+        when(userRepository.existsById(any(Long.class))).thenReturn(true);
         when(bookingRepository.getAllByBookerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
 
-        assertThrows(StatusBookingException.class,
-                () -> bookingService.getAllBookingByUserId(anna.getId(), UNKNOWN_STATE, FROM, null));
+        Pageable page = PageMaker.makePageableWithSort(FROM, null);
 
-        verify(userRepository, times(1)).findById(anna.getId());
+        assertThrows(StatusBookingException.class,
+                () -> bookingService.getAllBookingByUserId(anna.getId(), UNKNOWN_STATE, page));
+
+        verify(userRepository, times(1)).existsById(anna.getId());
     }
 
 
     @Transactional
     @Test
     void getAllBookingByUserId_shouldReturnBookingsIfBookingStateIsAll() {
-        Page<Booking> page = new PageImpl<>(List.of(booking));
+        Page<Booking> pages = new PageImpl<>(List.of(booking));
 
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(anna));
+        when(userRepository.existsById(any(Long.class))).thenReturn(true);
         when(bookingRepository.getAllByBookerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
-        when(bookingRepository.findByBookerIdOrderByStartDesc(any(Long.class), any(Pageable.class))).thenReturn(page);
+        when(bookingRepository.findByBookerIdOrderByStartDesc(any(Long.class), any(Pageable.class))).thenReturn(pages);
 
-        List<BookingDto> bookings = bookingService.getAllBookingByUserId(anna.getId(), STATE_ALL, FROM, SIZE);
+        Pageable page = PageMaker.makePageableWithSort(FROM, SIZE);
+
+        List<BookingDto> bookings = bookingService.getAllBookingByUserId(anna.getId(), STATE_ALL, page);
 
         assertNotNull(bookings, "List of bookings should not be null");
         assertFalse(bookings.isEmpty(), "List of bookings should not be empty");
         assertEquals(1, bookings.size());
 
-        verify(userRepository, times(1)).findById(anna.getId());
+        verify(userRepository, times(1)).existsById(anna.getId());
     }
 
     @Transactional
     @Test
     void getAllBookingByUserId_shouldReturnBookingsIfBookingStateIsCurrent() {
-        Page<Booking> page = new PageImpl<>(List.of(booking));
+        Page<Booking> pages = new PageImpl<>(List.of(booking));
 
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(anna));
+        when(userRepository.existsById(any(Long.class))).thenReturn(true);
         when(bookingRepository.getAllByBookerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
         when(bookingRepository.findCurrentBookingsByBookerId(any(Long.class), any(LocalDateTime.class),
-                any(Pageable.class))).thenReturn(page);
+                any(Pageable.class))).thenReturn(pages);
 
-        List<BookingDto> bookings = bookingService.getAllBookingByUserId(anna.getId(), STATE_CURRENT, FROM, SIZE);
+        Pageable page = PageMaker.makePageableWithSort(FROM, SIZE);
+
+        List<BookingDto> bookings = bookingService.getAllBookingByUserId(anna.getId(), STATE_CURRENT, page);
 
         assertNotNull(bookings, "List of bookings should not be null");
         assertFalse(bookings.isEmpty(), "List of bookings should not be empty");
         assertEquals(1, bookings.size());
 
-        verify(userRepository, times(1)).findById(anna.getId());
+        verify(userRepository, times(1)).existsById(anna.getId());
     }
 
     @Transactional
     @Test
     void getAllBookingByUserId_shouldReturnBookingsIfBookingStateIsPast() {
-        Page<Booking> page = new PageImpl<>(List.of(booking));
+        Page<Booking> pages = new PageImpl<>(List.of(booking));
 
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(anna));
+        when(userRepository.existsById(any(Long.class))).thenReturn(true);
         when(bookingRepository.getAllByBookerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
         when(bookingRepository.findByBookerIdAndEndInPast(any(Long.class), any(LocalDateTime.class),
-                any(Pageable.class))).thenReturn(page);
+                any(Pageable.class))).thenReturn(pages);
 
-        List<BookingDto> bookings = bookingService.getAllBookingByUserId(anna.getId(), STATE_PAST, FROM, SIZE);
+        Pageable page = PageMaker.makePageableWithSort(FROM, SIZE);
+
+        List<BookingDto> bookings = bookingService.getAllBookingByUserId(anna.getId(), STATE_PAST, page);
 
         assertNotNull(bookings, "List of bookings should not be null");
         assertFalse(bookings.isEmpty(), "List of bookings should not be empty");
         assertEquals(1, bookings.size());
 
-        verify(userRepository, times(1)).findById(anna.getId());
+        verify(userRepository, times(1)).existsById(anna.getId());
     }
 
     @Transactional
     @Test
     void getAllBookingByUserId_shouldReturnBookingsIfBookingStateIsFuture() {
-        Page<Booking> page = new PageImpl<>(List.of(booking));
+        Page<Booking> pages = new PageImpl<>(List.of(booking));
 
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(anna));
+        when(userRepository.existsById(any(Long.class))).thenReturn(true);
         when(bookingRepository.getAllByBookerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
         when(bookingRepository.findByBookerIdAndStartInFuture(any(Long.class), any(LocalDateTime.class),
-                any(Pageable.class))).thenReturn(page);
+                any(Pageable.class))).thenReturn(pages);
 
-        List<BookingDto> bookings = bookingService.getAllBookingByUserId(anna.getId(), STATE_FUTURE, FROM, SIZE);
+        Pageable page = PageMaker.makePageableWithSort(FROM, SIZE);
+
+        List<BookingDto> bookings = bookingService.getAllBookingByUserId(anna.getId(), STATE_FUTURE, page);
 
         assertNotNull(bookings, "List of bookings should not be null");
         assertFalse(bookings.isEmpty(), "List of bookings should not be empty");
         assertEquals(1, bookings.size());
 
-        verify(userRepository, times(1)).findById(anna.getId());
+        verify(userRepository, times(1)).existsById(anna.getId());
     }
 
     @Transactional
@@ -703,20 +758,22 @@ public class BookingServiceTest {
     void getAllBookingByUserId_shouldReturnBookingsIfBookingStateIsWaiting() {
         booking.setStatus(BookingStatus.WAITING);
 
-        Page<Booking> page = new PageImpl<>(List.of(booking));
+        Page<Booking> pages = new PageImpl<>(List.of(booking));
 
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(anna));
+        when(userRepository.existsById(any(Long.class))).thenReturn(true);
         when(bookingRepository.getAllByBookerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
         when(bookingRepository.findByBookerIdAndStatusContaining(any(Long.class), any(BookingStatus.class),
-                any(Pageable.class))).thenReturn(page);
+                any(Pageable.class))).thenReturn(pages);
 
-        List<BookingDto> bookings = bookingService.getAllBookingByUserId(anna.getId(), STATE_WAITING, FROM, SIZE);
+        Pageable page = PageMaker.makePageableWithSort(FROM, SIZE);
+
+        List<BookingDto> bookings = bookingService.getAllBookingByUserId(anna.getId(), STATE_WAITING, page);
 
         assertNotNull(bookings, "List of bookings should not be null");
         assertFalse(bookings.isEmpty(), "List of bookings should not be empty");
         assertEquals(1, bookings.size());
 
-        verify(userRepository, times(1)).findById(anna.getId());
+        verify(userRepository, times(1)).existsById(anna.getId());
     }
 
     @Transactional
@@ -724,31 +781,35 @@ public class BookingServiceTest {
     void getAllBookingByUserId_shouldReturnBookingsIfBookingStateIsRejected() {
         booking.setStatus(BookingStatus.REJECTED);
 
-        Page<Booking> page = new PageImpl<>(List.of(booking));
+        Page<Booking> pages = new PageImpl<>(List.of(booking));
 
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(anna));
+        when(userRepository.existsById(any(Long.class))).thenReturn(true);
         when(bookingRepository.getAllByBookerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
         when(bookingRepository.findByBookerIdAndStatusContaining(any(Long.class), any(BookingStatus.class),
-                any(Pageable.class))).thenReturn(page);
+                any(Pageable.class))).thenReturn(pages);
 
-        List<BookingDto> bookings = bookingService.getAllBookingByUserId(anna.getId(), STATE_REJECTED, FROM, SIZE);
+        Pageable page = PageMaker.makePageableWithSort(FROM, SIZE);
+
+        List<BookingDto> bookings = bookingService.getAllBookingByUserId(anna.getId(), STATE_REJECTED, page);
 
         assertNotNull(bookings, "List of bookings should not be null");
         assertFalse(bookings.isEmpty(), "List of bookings should not be empty");
         assertEquals(1, bookings.size());
 
-        verify(userRepository, times(1)).findById(anna.getId());
+        verify(userRepository, times(1)).existsById(anna.getId());
     }
 
     @Transactional
     @Test
     void getAllBookingByUserId_shouldThrowExceptionBookingStateIsUnknownState() {
-        when(userRepository.findById(any(Long.class))).thenReturn(Optional.of(anna));
+        when(userRepository.existsById(any(Long.class))).thenReturn(true);
         when(bookingRepository.getAllByBookerIdOrderByStartDesc(any(Long.class))).thenReturn(List.of(booking));
 
-        assertThrows(StatusBookingException.class,
-                () -> bookingService.getAllBookingByUserId(anna.getId(), UNKNOWN_STATE, FROM, SIZE));
+        Pageable page = PageMaker.makePageableWithSort(FROM, SIZE);
 
-        verify(userRepository, times(1)).findById(anna.getId());
+        assertThrows(StatusBookingException.class,
+                () -> bookingService.getAllBookingByUserId(anna.getId(), UNKNOWN_STATE, page));
+
+        verify(userRepository, times(1)).existsById(anna.getId());
     }
 }

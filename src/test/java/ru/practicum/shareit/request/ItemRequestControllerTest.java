@@ -8,8 +8,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import ru.practicum.shareit.common.PageMaker;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.request.controller.ItemRequestController;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
@@ -43,6 +45,8 @@ public class ItemRequestControllerTest {
 
     private static final LocalDateTime DATE =
             LocalDateTime.of(2023, 12, 10, 12, 30, 0);
+    private static final int FROM = 0;
+    private static final int SIZE = 10;
 
     @SneakyThrows
     @Test
@@ -140,8 +144,6 @@ public class ItemRequestControllerTest {
     @Test
     void getAllRequests_shouldReturnListOfRequests() {
         Long userId = 1L;
-        int from = 0;
-        int size = 10;
 
         User galina = new User(
                 1L,
@@ -154,19 +156,21 @@ public class ItemRequestControllerTest {
                 new ItemRequestDto(3L, "Request 3", galina, DATE.plusDays(3), new ArrayList<>())
         );
 
-        Mockito.when(itemRequestService.getAllRequests(userId, from, size)).thenReturn(requests);
+        Pageable page = PageMaker.makePageableWithSort(FROM, SIZE);
+
+        Mockito.when(itemRequestService.getAllRequests(userId, page)).thenReturn(requests);
 
         mvc.perform(get("/requests/all")
                         .header("X-Sharer-User-Id", String.valueOf(userId))
-                        .param("from", String.valueOf(from))
-                        .param("size", String.valueOf(size))
+                        .param("from", String.valueOf(FROM))
+                        .param("size", String.valueOf(SIZE))
                         .characterEncoding(StandardCharsets.UTF_8)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(content().json(objectMapper.writeValueAsString(requests)));
 
-        Mockito.verify(itemRequestService, Mockito.times(1)).getAllRequests(userId, from, size);
+        Mockito.verify(itemRequestService, Mockito.times(1)).getAllRequests(userId, page);
         Mockito.verifyNoMoreInteractions(itemRequestService);
     }
 

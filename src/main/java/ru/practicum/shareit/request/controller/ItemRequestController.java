@@ -2,6 +2,7 @@ package ru.practicum.shareit.request.controller;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.PathVariable;
+import ru.practicum.shareit.common.PageMaker;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.service.ItemRequestService;
 
@@ -43,7 +45,8 @@ public class ItemRequestController {
                                                @RequestParam(required = false) Integer from,
                                                @RequestParam(required = false) Integer size) {
         log.info("Get requests by user page by page {}", userId);
-        return requestService.getAllRequests(userId, from, size);
+        Pageable page = PageMaker.makePageableWithSort(from, size);
+        return requestService.getAllRequests(userId, page);
     }
 
     @GetMapping("/{requestId}")

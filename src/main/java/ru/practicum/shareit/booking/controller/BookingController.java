@@ -3,6 +3,7 @@ package ru.practicum.shareit.booking.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.GetMapping;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.service.BookingService;
+import ru.practicum.shareit.common.PageMaker;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -54,7 +56,9 @@ public class BookingController {
                                                  defaultValue = "ALL") String state,
                                          @RequestParam(required = false) Integer from,
                                          @RequestParam(required = false) Integer size) {
-        return bookingService.getAllBookingByUserId(userId, state, from, size);
+        log.info("Get all bookings by user={}", userId);
+        Pageable page = PageMaker.makePageableWithSort(from, size);
+        return bookingService.getAllBookingByUserId(userId, state, page);
     }
 
     @GetMapping("/owner")
@@ -63,6 +67,8 @@ public class BookingController {
                                                   defaultValue = "ALL") String state,
                                           @RequestParam(required = false) Integer from,
                                           @RequestParam(required = false) Integer size) {
-        return bookingService.getAllBookingByOwnerId(userId, state, from, size);
+        log.info("Get all bookings by owner={}", userId);
+        Pageable page = PageMaker.makePageableWithSort(from, size);
+        return bookingService.getAllBookingByOwnerId(userId, state, page);
     }
 }
