@@ -1,6 +1,8 @@
 package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.enums.BookingStatus;
@@ -8,6 +10,7 @@ import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
+import ru.practicum.shareit.exception.InvalidPathVariableException;
 import ru.practicum.shareit.exception.ObjectNotFoundException;
 import ru.practicum.shareit.exception.ObjectValidationException;
 import ru.practicum.shareit.exception.StatusBookingException;
@@ -94,38 +97,18 @@ public class BookingServiceImpl implements BookingService {
         return BookingMapper.toBookingDto(bookingRepository.save(booking));
     }
 
-
     @Override
     @Transactional(readOnly = true)
-    public List<BookingDto> getAllBookingByUserId(Long userId, String stateName) {
-        userRepository.findById(userId)
-                .orElseThrow(() -> new ObjectNotFoundException("User with id= " + userId + " not found."));
+    public List<BookingDto> getAllBookingByUserId(Long userId, String stateName, Pageable page) {
+        userRepository.existsById(userId);
         List<Booking> bookings = bookingRepository.getAllByBookerIdOrderByStartDesc(userId);
         if (bookings.isEmpty()) {
             throw new ObjectNotFoundException("The user " + userId + " has no reserved items");
         }
-        LocalDateTime dateTime = LocalDateTime.now();
-        switch (stateName) {
-            case "ALL":
-                bookings = bookingRepository.findByBookerIdOrderByStartDesc(userId);
-                break;
-            case "CURRENT":
-                bookings = bookingRepository.findCurrentBookingsByBookerId(userId, dateTime);
-                break;
-            case "PAST":
-                bookings = bookingRepository.findByBookerIdAndEndInPast(userId, dateTime);
-                break;
-            case "FUTURE":
-                bookings = bookingRepository.findByBookerIdAndStartInFuture(userId, dateTime);
-                break;
-            case "WAITING":
-                bookings = bookingRepository.findByBookerIdAndStatusContaining(userId, BookingStatus.WAITING);
-                break;
-            case "REJECTED":
-                bookings = bookingRepository.findByBookerIdAndStatusContaining(userId, BookingStatus.REJECTED);
-                break;
-            default:
-                throw new StatusBookingException(String.format("Unknown state: %s", stateName));
+        if (page.isUnpaged()) {
+            bookings = getBookingByStateByUserId(userId, stateName);
+        } else {
+            bookings = getBookingByStateByUserId(userId, stateName, page).getContent();
         }
         return bookings
                 .stream()
@@ -134,41 +117,120 @@ public class BookingServiceImpl implements BookingService {
 
     }
 
+    private Page<Booking> getBookingByStateByUserId(Long userId, String stateName, Pageable page) {
+        LocalDateTime dateTime = LocalDateTime.now();
+        try {
+            switch (stateName) {
+                case "ALL":
+                    return bookingRepository.findByBookerIdOrderByStartDesc(userId, page);
+                case "CURRENT":
+                    return bookingRepository.findCurrentBookingsByBookerId(userId, dateTime, page);
+                case "PAST":
+                    return bookingRepository.findByBookerIdAndEndInPast(userId, dateTime, page);
+                case "FUTURE":
+                    return bookingRepository.findByBookerIdAndStartInFuture(userId, dateTime, page);
+                case "WAITING":
+                    return bookingRepository.findByBookerIdAndStatusContaining(userId, BookingStatus.WAITING, page);
+                case "REJECTED":
+                    return bookingRepository.findByBookerIdAndStatusContaining(userId, BookingStatus.REJECTED, page);
+                default:
+                    throw new StatusBookingException(String.format("Unknown state: %s", stateName));
+            }
+        } catch (IllegalArgumentException iae) {
+            throw new InvalidPathVariableException("Unknown state: " + stateName);
+        }
+    }
+
+    private List<Booking> getBookingByStateByUserId(Long userId, String stateName) {
+        LocalDateTime dateTime = LocalDateTime.now();
+        try {
+            switch (stateName) {
+                case "ALL":
+                    return bookingRepository.findByBookerIdOrderByStartDesc(userId);
+                case "CURRENT":
+                    return bookingRepository.findCurrentBookingsByBookerId(userId, dateTime);
+                case "PAST":
+                    return bookingRepository.findByBookerIdAndEndInPast(userId, dateTime);
+                case "FUTURE":
+                    return bookingRepository.findByBookerIdAndStartInFuture(userId, dateTime);
+                case "WAITING":
+                    return bookingRepository.findByBookerIdAndStatusContaining(userId, BookingStatus.WAITING);
+                case "REJECTED":
+                    return bookingRepository.findByBookerIdAndStatusContaining(userId, BookingStatus.REJECTED);
+                default:
+                    throw new StatusBookingException(String.format("Unknown state: %s", stateName));
+            }
+        } catch (IllegalArgumentException iae) {
+            throw new InvalidPathVariableException("Unknown state: " + stateName);
+        }
+    }
+
     @Override
     @Transactional(readOnly = true)
-    public List<BookingDto> getAllBookingByOwnerId(Long userId, String stateName) {
-        userRepository.findById(userId)
-                .orElseThrow(() -> new ObjectNotFoundException("Owner with id= " + userId + " not found"));
+    public List<BookingDto> getAllBookingByOwnerId(Long userId, String stateName, Pageable page) {
+        userRepository.existsById(userId);
         List<Booking> bookings = bookingRepository.getAllByItemOwnerIdOrderByStartDesc(userId);
         if (bookings.isEmpty()) {
             throw new ObjectNotFoundException("The user " + userId + " has no reserved items");
         }
-        LocalDateTime dateTime = LocalDateTime.now();
-        switch (stateName) {
-            case "ALL":
-                bookings = bookingRepository.getAllBookingsForOwnersItems(userId);
-                break;
-            case "CURRENT":
-                bookings = bookingRepository.getCurrentBookingsForOwnersItems(userId, dateTime, dateTime);
-                break;
-            case "PAST":
-                bookings = bookingRepository.getPastBookingsForOwnersItems(userId, dateTime);
-                break;
-            case "FUTURE":
-                bookings = bookingRepository.getFutureBookingsForOwnersItems(userId, dateTime);
-                break;
-            case "WAITING":
-                bookings = bookingRepository.getBookingsForOwnersWithStatusContaining(userId, BookingStatus.WAITING);
-                break;
-            case "REJECTED":
-                bookings = bookingRepository.getBookingsForOwnersWithStatusContaining(userId, BookingStatus.REJECTED);
-                break;
-            default:
-                throw new StatusBookingException(String.format("Unknown state: %s", stateName));
+        if (page.isUnpaged()) {
+            bookings = getBookingByStateByOwnerId(userId, stateName);
+        } else {
+            bookings = getBookingByStateByOwnerId(userId, stateName, page).getContent();
         }
         return bookings
                 .stream()
                 .map(BookingMapper::toBookingDto)
                 .collect(Collectors.toList());
+    }
+
+    private Page<Booking> getBookingByStateByOwnerId(Long userId, String stateName, Pageable page) {
+        LocalDateTime dateTime = LocalDateTime.now();
+        try {
+            switch (stateName) {
+                case "ALL":
+                    return bookingRepository.getAllBookingsForOwnersItems(userId, page);
+                case "CURRENT":
+                    return bookingRepository.getCurrentBookingsForOwnersItems(userId, dateTime, dateTime, page);
+                case "PAST":
+                    return bookingRepository.getPastBookingsForOwnersItems(userId, dateTime, page);
+                case "FUTURE":
+                    return bookingRepository.getFutureBookingsForOwnersItems(userId, dateTime, page);
+                case "WAITING":
+                    return bookingRepository.getBookingsForOwnersWithStatusContaining(userId, BookingStatus.WAITING,
+                            page);
+                case "REJECTED":
+                    return bookingRepository.getBookingsForOwnersWithStatusContaining(userId, BookingStatus.REJECTED,
+                            page);
+                default:
+                    throw new StatusBookingException(String.format("Unknown state: %s", stateName));
+            }
+        } catch (IllegalArgumentException iae) {
+            throw new InvalidPathVariableException("Unknown state: " + stateName);
+        }
+    }
+
+    private List<Booking> getBookingByStateByOwnerId(Long userId, String stateName) {
+        LocalDateTime dateTime = LocalDateTime.now();
+        try {
+            switch (stateName) {
+                case "ALL":
+                    return bookingRepository.getAllBookingsForOwnersItems(userId);
+                case "CURRENT":
+                    return bookingRepository.getCurrentBookingsForOwnersItems(userId, dateTime, dateTime);
+                case "PAST":
+                    return bookingRepository.getPastBookingsForOwnersItems(userId, dateTime);
+                case "FUTURE":
+                    return bookingRepository.getFutureBookingsForOwnersItems(userId, dateTime);
+                case "WAITING":
+                    return bookingRepository.getBookingsForOwnersWithStatusContaining(userId, BookingStatus.WAITING);
+                case "REJECTED":
+                    return bookingRepository.getBookingsForOwnersWithStatusContaining(userId, BookingStatus.REJECTED);
+                default:
+                    throw new StatusBookingException(String.format("Unknown state: %s", stateName));
+            }
+        } catch (IllegalArgumentException iae) {
+            throw new InvalidPathVariableException("Unknown state: " + stateName);
+        }
     }
 }

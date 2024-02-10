@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
 public class BookingDto {
 
@@ -37,5 +38,6 @@ public class BookingDto {
     @NoArgsConstructor
     public static class User {
         private Long id;
+        private String name;
     }
 }

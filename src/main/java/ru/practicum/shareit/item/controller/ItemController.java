@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.controller;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -13,9 +14,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.GetMapping;
 import ru.practicum.shareit.common.Create;
+import ru.practicum.shareit.common.PageMaker;
 import ru.practicum.shareit.item.dto.ItemDtoWithBooking;
 import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.service.ItemServiceImpl;
+import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.comments.dto.CommentDto;
 
 import java.util.List;
@@ -26,7 +28,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ItemController {
 
-    private final ItemServiceImpl itemService;
+    private final ItemService itemService;
 
     @PostMapping
     public ItemDto create(@Validated({Create.class}) @RequestHeader("X-Sharer-User-Id") long userId,
@@ -50,15 +52,22 @@ public class ItemController {
     }
 
     @GetMapping
-    public List<ItemDtoWithBooking> getItemsByUser(@RequestHeader("X-Sharer-User-Id") long userId) {
+    public List<ItemDtoWithBooking> getItemsByUser(@RequestHeader("X-Sharer-User-Id") long userId,
+                                                   @RequestParam(required = false) Integer from,
+                                                   @RequestParam(required = false) Integer size) {
         log.info("Get all items user={}", userId);
-        return itemService.getItemsByUser(userId);
+        Pageable page = PageMaker.makePageableWithSort(from, size);
+        return itemService.getItemsByUser(userId, page);
     }
 
     @GetMapping("/search")
-    public List<ItemDto> searchItemByQuery(@RequestHeader("X-Sharer-User-Id") Long userId, @RequestParam String text) {
+    public List<ItemDto> searchItemByQuery(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                           @RequestParam String text,
+                                           @RequestParam(required = false) Integer from,
+                                           @RequestParam(required = false) Integer size) {
         log.info("Search item text={}", text);
-        return itemService.searchItemByQuery(userId, text);
+        Pageable page = PageMaker.makePageableWithSort(from, size);
+        return itemService.searchItemByQuery(userId, text, page);
     }
 
     @PostMapping("/{itemId}/comment")

@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.enums.BookingStatus;
@@ -25,6 +26,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 import static ru.practicum.shareit.item.mapper.ItemMapper.toItemDto;
@@ -100,11 +102,16 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemDtoWithBooking> getItemsByUser(Long userId) {
+    public List<ItemDtoWithBooking> getItemsByUser(Long userId, Pageable page) {
         LocalDateTime dateTime = LocalDateTime.now();
-        return itemRepository.findByOwnerIdOrderByIdAsc(userId)
-                .stream()
-                .map(item -> {
+        userRepository.existsById(userId);
+        Stream<Item> items;
+        if (page.isUnpaged()) {
+            items = itemRepository.findByOwnerIdOrderByIdAsc(userId).stream();
+        } else {
+            items = itemRepository.findByOwnerIdOrderByIdAsc(userId, page).get();
+        }
+        return items.map(item -> {
                     List<Comment> comments = getReviewsByItemId(item);
                     Booking lastBooking =
                             bookingRepository.getFirstByItemIdAndEndBeforeOrderByEndDesc(item.getId(), dateTime);
@@ -117,16 +124,22 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ItemDto> searchItemByQuery(Long userId, String text) {
+    public List<ItemDto> searchItemByQuery(Long userId, String text, Pageable page) {
         if (text.isEmpty() || text.isBlank()) {
             return new ArrayList<>();
         }
-
-        List<ItemDto> items = itemRepository.searchByQuery(text)
-                .stream()
-                .map(ItemMapper::toItemDto)
-                .collect(Collectors.toList());
-        return items;
+        userRepository.existsById(userId);
+        if (page.isUnpaged()) {
+            return itemRepository.searchByQuery(text)
+                    .stream()
+                    .map(ItemMapper::toItemDto)
+                    .collect(Collectors.toList());
+        } else {
+            return itemRepository.searchByQuery(text, page)
+                    .stream()
+                    .map(ItemMapper::toItemDto)
+                    .collect(Collectors.toList());
+        }
     }
 
     @Override
